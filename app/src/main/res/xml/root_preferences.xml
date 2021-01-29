@@ -1,0 +1,111 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="参数/指定参数"
+        app:iconSpaceReserved="false">
+        <Preference
+            app:key="settings_edit_text_Preference"
+            app:layout="@layout/settings_edit_text"
+            app:iconSpaceReserved="false"
+            app:selectable="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="参数/其他"
+        app:iconSpaceReserved="false">
+        <SwitchPreference
+            app:key="color_reverse_Preference"
+            app:title="颜色反转"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            />
+        <ListPreference
+            app:key="fractal_id_Preference"
+            app:title="图形id"
+            app:useSimpleSummaryProvider="true"
+            app:dialogTitle="请选择图形id"
+            app:entries="@array/fractal_id"
+            app:entryValues="@array/fractal_id"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            app:key="generate_mode_Preference"
+            app:title="渲染模式"
+            app:dialogTitle="请选择渲染模式"
+            app:useSimpleSummaryProvider="true"
+            app:entries="@array/generate_mode"
+            app:entryValues="@array/generate_mode"
+            app:iconSpaceReserved="false"/>
+
+        <Preference
+            app:key="read_data_Preference"
+            app:title="恢复上一次退出时的参数"
+            app:iconSpaceReserved="false"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="显示"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="night_mode_Preference"
+            app:title="夜间模式"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            />
+   </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="杂项"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:key="open_picture_Preference"
+            app:title="将当前渲染的图片保存到相册"
+            app:summary="Android/data/com.zjh.fractal/files/fractal.png"
+            app:iconSpaceReserved="false">
+
+        </Preference>
+        <ListPreference
+            app:key="samples_Preference"
+            app:title="渲染例子"
+            app:dialogTitle="请选择渲染例子"
+            app:entries="@array/samples"
+            app:entryValues="@array/samples"
+            app:iconSpaceReserved="false"
+            app:defaultValue="false"/>
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:title="关于"
+        app:iconSpaceReserved="false"
+        >
+        <Preference
+            app:key="about_fractal_Preference"
+            app:iconSpaceReserved="false"
+            app:enableCopying="true"
+            app:title="关于分形"
+            >
+        </Preference>
+
+        <Preference app:title="B站视频:曼德博集合放大10^30倍"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://www.bilibili.com/video/BV1ex411D7TV" />
+        </Preference>
+        <Preference app:title="B站视频:曼德博集合放大3.4E1091倍"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://www.bilibili.com/video/BV1N441187Dh" />
+        </Preference>
+        <Preference app:title="B站视频:火烧船分形放大"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://www.bilibili.com/video/BV1JE411E7aV" />
+        </Preference>
+        <Preference app:title="Github:Small-Totem"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://github.com/Small-Totem/Fractal_Android" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

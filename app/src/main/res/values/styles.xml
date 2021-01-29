@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Fractal_Main" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorAccent">@color/light_blue</item>
+        <item name="android:windowBackground">@color/black</item>
+        <!--为了启动时为黑色而非白色-->
+    </style>
+    <style name="Fractal" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorAccent">@color/light_blue</item>
+    </style>
+</resources>

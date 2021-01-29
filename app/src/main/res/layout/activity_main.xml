@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dark_mode_light"
+    >
+
+    <ImageView
+        android:id="@+id/fractal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
+
+    <!--中心线-->
+    <View
+        android:id="@+id/axis_horizontal"
+        android:layout_gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/white"
+        android:visibility="gone"/>
+    <View
+        android:id="@+id/axis_vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="0.5dp"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:visibility="gone"/>
+
+    <com.zjh.fractal.BottomDrawerLayout
+        android:id="@+id/bottom_drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+
+        <!--弹出-->
+        <LinearLayout
+            android:id="@+id/fractal_ConstraintLayout2_LinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:orientation="vertical"
+            >
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:visibility="invisible"
+                android:id="@+id/fractal_ConstraintLayout3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="0.75"
+                android:background="@color/back_for_layout">
+                <Button
+                    android:id="@+id/fractal_more_btn1"
+                    android:text="横向x2"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="double_horizontal"
+                    android:enabled="false"/>
+                <Button
+                    android:id="@+id/fractal_more_btn2"
+                    android:text="纵向x2"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn1"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="double_vertical"
+                    android:enabled="false"/>
+                <Button
+                    android:id="@+id/fractal_more_btn3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="反转"
+                    android:onClick="reverse"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn2"
+                    app:layout_constraintEnd_toEndOf="@+id/fractal_more_btn4" />
+                <Button
+                    android:id="@+id/fractal_more_btn4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="更改渲染模式"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:onClick="change_generate_mode"/>
+                <Button
+                    android:id="@+id/fractal_more_btn5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="迭代次数x2"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_more_btn1"
+                    app:layout_constraintStart_toStartOf="@+id/fractal_more_btn1"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn6"
+                    android:onClick="iteration_times_double"/>
+                <Button
+                    android:id="@+id/fractal_more_btn6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="迭代次数/2"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn5"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:onClick="iteration_times_half"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/fractal_ConstraintLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="192dp"
+                android:background="@color/back_for_layout"
+                android:alpha="0.7"
+                >
+                <Button
+
+                    android:id="@+id/fractal_btn1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="generate_fractal"
+                    android:text="1x渲染"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/fractal_btn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="generate_fractal_low_quality"
+                    android:text="0.5x渲染"
+
+                    app:layout_constraintStart_toStartOf="@+id/fractal_btn1"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_btn1" />
+
+                <Button
+                    android:id="@+id/fractal_btn3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="fractal_double"
+                    android:text="放大x2"
+
+                    app:layout_constraintStart_toStartOf="@+id/fractal_btn2"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_btn2" />
+
+                <Button
+                    android:id="@+id/fractal_btn4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="fractal_half"
+                    android:text="缩小/2"
+
+                    app:layout_constraintStart_toStartOf="@+id/fractal_btn3"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_btn3" />
+
+                <Button
+                    android:id="@+id/fractal_btn5"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:onClick="fractal_up"
+                    android:text="↑"
+                    android:textSize="24sp"
+                    android:layout_marginTop="6dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/fractal_btn6"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:onClick="fractal_down"
+                    android:text="↓"
+                    android:textSize="24sp"
+                    app:layout_constraintStart_toStartOf="@+id/fractal_btn5"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_btn7" />
+
+                <Button
+                    android:id="@+id/fractal_btn7"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:onClick="fractal_left"
+                    android:text="←"
+                    android:textSize="24sp"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_btn5"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_btn5" />
+
+                <Button
+                    android:id="@+id/fractal_btn8"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:onClick="fractal_right"
+                    android:text="→"
+
+                    android:textSize="24sp"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_btn5"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_btn5" />
+
+                <Button
+                    android:id="@+id/fractal_btn9"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:onClick="fractal_left_up"
+                    android:text="↖"
+
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_btn5"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_btn5" />
+
+                <Button
+                    android:id="@+id/fractal_btn10"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:onClick="fractal_right_up"
+                    android:text="↗"
+
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_btn5"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_btn5" />
+
+                <Button
+                    android:id="@+id/fractal_btn11"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:onClick="fractal_left_down"
+                    android:text="↙"
+
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_btn6"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_btn6" />
+
+                <Button
+                    android:id="@+id/fractal_btn12"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:onClick="fractal_right_down"
+                    android:text="↘"
+
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_btn6"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_btn6" />
+
+                <LinearLayout
+                    android:layout_width="88dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    >
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="立即渲染"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:layout_gravity="start|center_vertical"
+                            />
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/fractal_switch1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:thumbTint="@color/white"
+                            android:layout_gravity="end|center_vertical"/>
+                    </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="透明化"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:layout_gravity="start|center_vertical"
+                            />
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/fractal_switch2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:thumbTint="@color/white"
+                            android:layout_gravity="end|center_vertical"
+                            />
+                    </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="附加项"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:layout_gravity="start|center_vertical"
+                            />
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/fractal_switch3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:thumbTint="@color/white"
+                            android:layout_gravity="end|center_vertical"
+                            />
+                    </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="中心线"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:layout_gravity="start|center_vertical"
+                            />
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/fractal_switch4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:thumbTint="@color/white"
+                            android:layout_gravity="end|center_vertical"
+                            />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/settings"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:clickable="true"
+                    android:onClick="settings"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <ImageView
+                        android:id="@+id/settings_img"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/settings"
+                        app:tint="@color/white"
+                        android:background="@drawable/ripple"/>
+                </FrameLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <!--底层-->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/fractal_ConstraintLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/back_for_layout"
+            android:alpha="0.8"
+            android:layout_alignParentBottom="true"
+            >
+            <TextView
+                android:id="@+id/fractal_text_x"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="20dp"
+                android:text="X=0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/fractal_text_y"/>
+
+            <TextView
+                android:id="@+id/fractal_text_y"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="20dp"
+                android:text="Y=0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@+id/fractal_text_x"
+                app:layout_constraintTop_toTopOf="@+id/fractal_text_x"
+                app:layout_constraintEnd_toStartOf="@+id/hide"/>
+
+
+            <TextView
+                android:id="@+id/fractal_text_iteration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="20dp"
+                android:text="迭代次数=0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fractal_text_x"
+                app:layout_constraintEnd_toStartOf="@id/fractal_text_scale"/>
+
+            <TextView
+                android:id="@+id/fractal_text_scale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="20dp"
+                android:text="缩放倍率=0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@+id/fractal_text_iteration"
+                app:layout_constraintTop_toTopOf="@+id/fractal_text_iteration"
+                app:layout_constraintEnd_toStartOf="@+id/hide"/>
+
+            <TextView
+                android:id="@+id/fractal_text_reversal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="20dp"
+                android:text="反转=false"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fractal_text_scale"
+                app:layout_constraintEnd_toStartOf="@+id/fractal_text_pixel"/>
+
+            <TextView
+                android:id="@+id/fractal_text_pixel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="20dp"
+                android:text="渲染倍率=0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@+id/fractal_text_reversal"
+                app:layout_constraintTop_toTopOf="@+id/fractal_text_reversal"
+                app:layout_constraintEnd_toStartOf="@+id/fractal_text_generate_mode"/>
+
+
+            <TextView
+                android:id="@+id/fractal_text_generate_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="20dp"
+                android:text="渲染模式=0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@+id/fractal_text_pixel"
+                app:layout_constraintTop_toTopOf="@+id/fractal_text_reversal"
+                app:layout_constraintEnd_toStartOf="@+id/fractal_text_generate_id"/>
+            <TextView
+                android:id="@+id/fractal_text_generate_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="20dp"
+                android:text="ID=0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@+id/fractal_text_generate_mode"
+                app:layout_constraintTop_toTopOf="@+id/fractal_text_generate_mode"
+                app:layout_constraintEnd_toStartOf="@+id/hide"/>
+
+            <FrameLayout
+                android:id="@+id/hide"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:layout_marginEnd="4dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:id="@+id/hide_img"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+
+                    android:layout_gravity="center"
+
+                    android:scaleType="centerInside"
+                    android:src="@drawable/up"
+                    app:tint="@color/white"
+
+                    />
+            </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.zjh.fractal.BottomDrawerLayout>
+
+</FrameLayout>

@@ -1,0 +1,61 @@
+<resources>
+    <string-array name="fractal_id">
+        <item>(曼德博集合)\n0(f(z)=z^2)</item>
+        <item>1(f(z)=z^3)</item>
+        <item>2(f(z)=z^4)</item>
+        <item>3(f(z)=z^2+z^3+z^4)</item>
+        <item>4(f(z)=z^2-z^3)</item>
+        <item>(火烧船分形)\n5(f(z)=(|Re(z)|+|Im(z)|)^2)</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>(茱莉亚集合)\n9</item>
+        <item>(牛顿分形)(测试)\n10</item>
+        <item>(用于渲染测试)\n-1</item>
+    </string-array>
+
+    <string-array name="generate_mode">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>(以下的渲染模式色彩变化剧烈，可能看起来很恶心)\n10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>(测试)\n-1</item>
+        <item>(黑白)\n-2</item>
+    </string-array>
+
+    <string-array name="samples">
+        <item>id=0/1</item>
+        <item>id=0/2</item>
+        <item>id=0/3</item>
+        <item>id=0/4</item>
+        <item>id=0/5</item>
+        <item>id=0/6</item>
+        <item>(需要渲染较长时间)\nid=0/7</item>
+        <item>(需要渲染较长时间)\nid=0/8</item>
+        <item>(需要渲染较长时间)\nid=0/9</item>
+        <item>id=3/1</item>
+        <item>id=3/2</item>
+        <item>id=3/3</item>
+        <item>id=5/1</item>
+        <item>id=5/2</item>
+        <item>id=6/1</item>
+        <item>id=6/2</item>
+    </string-array>
+</resources>
