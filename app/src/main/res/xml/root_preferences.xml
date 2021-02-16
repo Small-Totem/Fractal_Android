@@ -14,7 +14,7 @@
         app:iconSpaceReserved="false">
         <SwitchPreference
             app:key="color_reverse_Preference"
-            app:title="颜色反转"
+            app:title="渲染颜色反转"
             app:defaultValue="true"
             app:iconSpaceReserved="false"
             />
@@ -63,7 +63,6 @@
             app:title="将当前渲染的图片保存到相册"
             app:summary="Android/data/com.zjh.fractal/files/fractal.png"
             app:iconSpaceReserved="false">
-
         </Preference>
         <ListPreference
             app:key="samples_Preference"
@@ -73,7 +72,15 @@
             app:entryValues="@array/samples"
             app:iconSpaceReserved="false"
             app:defaultValue="false"/>
-
+        <ListPreference
+            app:key="thread_Preference"
+            app:title="多线程渲染"
+            app:dialogTitle="多线程渲染(测试)"
+            app:entries="@array/thread"
+            app:entryValues="@array/thread"
+            app:defaultValue="aaa"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
     <PreferenceCategory
         app:title="关于"

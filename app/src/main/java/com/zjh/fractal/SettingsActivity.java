@@ -16,8 +16,6 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import static com.zjh.fractal.MainActivity.GetLocalBitmap;
-
 public class SettingsActivity extends AppCompatActivity {
 
     @Override
@@ -50,6 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
         Preference settings_edit_text_Preference;
         Preference samples_Preference;
         Preference about_fractal_Preference;
+        Preference thread_Preference;
 
         boolean first_click=true;
         @Override
@@ -68,6 +67,7 @@ public class SettingsActivity extends AppCompatActivity {
             settings_edit_text_Preference   =findPreference("settings_edit_text_Preference");
             samples_Preference              =findPreference("samples_Preference");
             about_fractal_Preference        =findPreference("about_fractal_Preference");
+            thread_Preference               =findPreference("thread_Preference");
 
             night_mode_Preference.setOnPreferenceClickListener(this);
             color_reverse_Preference.setOnPreferenceClickListener(this);
@@ -77,6 +77,8 @@ public class SettingsActivity extends AppCompatActivity {
             fractal_id_Preference.setOnPreferenceChangeListener(this);
             generate_mode_Preference.setOnPreferenceChangeListener(this);
             samples_Preference.setOnPreferenceChangeListener(this);
+            thread_Preference.setOnPreferenceChangeListener(this);
+
         }
 
         @Override
@@ -114,7 +116,7 @@ public class SettingsActivity extends AppCompatActivity {
            else if(preference.equals(open_picture_Preference)){
                //轮子:打开图片
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                Bitmap bitmap =GetLocalBitmap(MainActivity.file_path);;
+                Bitmap bitmap =ImageProcess.GetLocalBitmap(MainActivity.file_path);;
                 String uriString = MediaStore.Images.Media.insertImage(getContext().getContentResolver(),bitmap,null,null);
                 Uri uri = Uri.parse(uriString);
                 intent.setDataAndType(uri,"image/*");
@@ -172,6 +174,17 @@ public class SettingsActivity extends AppCompatActivity {
                 samples_Preference.setSummary("正在渲染");
                 getActivity().finish();
             }
+            else if (preference.equals(thread_Preference)) {
+                final String[] str= getResources().getStringArray(R.array.thread);
+                for(int i=0;i<str.length;i++){
+                    if(str[i].equals(new_str)){
+                        MainActivity.use_thread=i*2;
+                        //i=0(不使用多线程)->use_thread=0
+                        //i=1->use_thread=2->2线程
+                        return true;
+                    }
+                }
+            }
             return false;
         }
     }
@@ -182,7 +195,7 @@ public class SettingsActivity extends AppCompatActivity {
             MainActivity.center_x = SaveData.get_data_double(c, "center_x_true");
             MainActivity.center_y = SaveData.get_data_double(c, "center_y_true");
             MainActivity.scale_times = SaveData.get_data_double(c, "scale_times_true");
-            MainActivity.pixel_times = SaveData.get_data_double(c, "pixel_times_true");
+            MainActivity.pixel_times = 0.5;
             //MainActivity.generate_now_quality=SaveData.get_data_double(c,"generate_now_quality");
             MainActivity.generate_now_quality = 0.3;
             MainActivity.color_reversal = SaveData.get_data_boolean(c, "color_reversal_true");
@@ -194,7 +207,7 @@ public class SettingsActivity extends AppCompatActivity {
             MainActivity.center_x = SaveData.get_data_double(c, "center_x_false");
             MainActivity.center_y = SaveData.get_data_double(c, "center_y_false");
             MainActivity.scale_times = SaveData.get_data_double(c, "scale_times_false");
-            MainActivity.pixel_times = SaveData.get_data_double(c, "pixel_times_false");
+            MainActivity.pixel_times = 0.5;
             //MainActivity.generate_now_quality=SaveData.get_data_double(c,"generate_now_quality");
             MainActivity.generate_now_quality = 0.3;
             MainActivity.color_reversal = SaveData.get_data_boolean(c, "color_reversal_false");
@@ -205,7 +218,9 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static void set_sample(int i){
-        final int sample_id_0_num=9;//如果这里是8 则为0->7 共8个id=0的例子
+        final int sample_id_0_num=11;//如果这里是8 则为0->7 共8个id=0的例子
+        final int sample_id_3_num=3;
+        final int sample_id_5_num=6;
         switch (i){
             case 0:
                 MainActivity.center_x = 0.0016429555369541044;
@@ -297,6 +312,28 @@ public class SettingsActivity extends AppCompatActivity {
                 MainActivity.generate_mode = 1;
                 MainActivity.iteration_times = 10000;
                 break;
+
+            case 9:
+                MainActivity.center_x = -1.7496286153793283;
+                MainActivity.center_y = 0;
+                MainActivity.scale_times = 8388608;
+                MainActivity.pixel_times = 1;
+                MainActivity.color_reversal = true;
+                MainActivity.fractal_id = 0;
+                MainActivity.generate_mode = 6;
+                MainActivity.iteration_times = 500;
+                break;
+            case 10:
+                MainActivity.center_x = -1.4082885742185;
+                MainActivity.center_y = 0.1366455078125;
+                MainActivity.scale_times = 16384;
+                MainActivity.pixel_times = 1;
+                MainActivity.color_reversal = true;
+                MainActivity.fractal_id = 0;
+                MainActivity.generate_mode = 8;
+                MainActivity.iteration_times = 1024;
+                break;
+
             case sample_id_0_num:
                 MainActivity.center_x = 0.14709487090110732;
                 MainActivity.center_y = -0.8748064100742339;
@@ -327,7 +364,7 @@ public class SettingsActivity extends AppCompatActivity {
                 MainActivity.generate_mode = 1;
                 MainActivity.iteration_times = 200;
                 break;
-            case sample_id_0_num+3:
+            case sample_id_0_num+sample_id_3_num:
                 MainActivity.center_x = -1.75;
                 MainActivity.center_y = -0.03;
                 MainActivity.scale_times = 24;
@@ -337,7 +374,7 @@ public class SettingsActivity extends AppCompatActivity {
                 MainActivity.generate_mode = 0;
                 MainActivity.iteration_times = 128;
                 break;
-            case sample_id_0_num+4:
+            case sample_id_0_num+sample_id_3_num+1:
                 MainActivity.center_x = -1.861344696144;
                 MainActivity.center_y = -0.003114566940348595;
                 MainActivity.scale_times = 6.87E10;
@@ -347,7 +384,48 @@ public class SettingsActivity extends AppCompatActivity {
                 MainActivity.generate_mode = 2;
                 MainActivity.iteration_times = 128;
                 break;
-            case sample_id_0_num+5:
+            case sample_id_0_num+sample_id_3_num+2:
+                MainActivity.center_x = -1.8101560225213849;
+                MainActivity.center_y = -0.00364331702183375;
+                MainActivity.scale_times = 5E12;
+                MainActivity.pixel_times = 1;
+                MainActivity.color_reversal = true;
+                MainActivity.fractal_id = 5;
+                MainActivity.generate_mode = 0;
+                MainActivity.iteration_times = 128;
+                break;
+            case sample_id_0_num+sample_id_3_num+3:
+                MainActivity.center_x = -1.7783556904313647;
+                MainActivity.center_y = -0.05607528583630487;
+                MainActivity.scale_times = 8E8;
+                MainActivity.pixel_times = 1;
+                MainActivity.color_reversal = true;
+                MainActivity.fractal_id = 5;
+                MainActivity.generate_mode = 2;
+                MainActivity.iteration_times = 256;
+                break;
+            case sample_id_0_num+sample_id_3_num+4:
+                MainActivity.center_x = -1.9433338235357482;
+                MainActivity.center_y = -0.0020569693544075615;
+                MainActivity.scale_times = 1E12;
+                MainActivity.pixel_times = 1;
+                MainActivity.color_reversal = true;
+                MainActivity.fractal_id = 5;
+                MainActivity.generate_mode = 0;
+                MainActivity.iteration_times = 128;
+                break;
+            case sample_id_0_num+sample_id_3_num+5:
+                MainActivity.center_x = -1.9433338235660342;
+                MainActivity.center_y = -0.002056970956755327;
+                MainActivity.scale_times = 5E8;
+                MainActivity.pixel_times = 1;
+                MainActivity.color_reversal = true;
+                MainActivity.fractal_id = 5;
+                MainActivity.generate_mode = 2;
+                MainActivity.iteration_times = 128;
+                break;
+
+            case sample_id_0_num +sample_id_3_num+ sample_id_5_num:
                 MainActivity.center_x = -1.29175;
                 MainActivity.center_y = -0.02152;
                 MainActivity.scale_times = 150;
@@ -357,7 +435,7 @@ public class SettingsActivity extends AppCompatActivity {
                 MainActivity.generate_mode = 4;
                 MainActivity.iteration_times = 200;
                 break;
-            case sample_id_0_num+6:
+            case sample_id_0_num +sample_id_3_num+ sample_id_5_num+1:
                 MainActivity.center_x = -1.197229619137943;
                 MainActivity.center_y = -0.1428861228865572;
                 MainActivity.scale_times = 8192;
@@ -430,7 +508,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         try {
             double d=Double.parseDouble(et4.getText().toString());
-            if(d>1||d<0.1){
+            if(d>3||d<0.1){
                 et4.setTextColor(getColor(R.color.red));
                 flag_return=true;
             }
@@ -476,7 +554,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
         catch(NumberFormatException e){
-            System.out.println(e);
             if(!"java.lang.NumberFormatException: For input string: \"\"".equals(e.toString())) {
                 et6.setTextColor(getColor(R.color.red));
                 flag_return=true;

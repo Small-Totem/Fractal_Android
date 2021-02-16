@@ -50,12 +50,27 @@
         <item>(需要渲染较长时间)\nid=0/7</item>
         <item>(需要渲染较长时间)\nid=0/8</item>
         <item>(需要渲染较长时间)\nid=0/9</item>
+        <item>id=0/10</item>
+        <item>id=0/11</item>
         <item>id=3/1</item>
         <item>id=3/2</item>
         <item>id=3/3</item>
         <item>id=5/1</item>
         <item>id=5/2</item>
+        <item>id=5/3</item>
+        <item>id=5/4</item>
+        <item>id=5/5</item>
+        <item>id=5/6</item>
         <item>id=6/1</item>
         <item>id=6/2</item>
+    </string-array>
+
+    <string-array name="thread">
+        <item>不使用多线程</item>
+        <item>2线程</item>
+        <item>4线程</item>
+        <item>6线程</item>
+        <item>8线程</item>
+        <item>10线程</item>
     </string-array>
 </resources>

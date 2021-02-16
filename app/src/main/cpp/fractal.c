@@ -5,6 +5,13 @@
 #include <jni.h>
 #include <stdlib.h>
 #include <math.h>
+#include <pthread.h>
+
+struct Param {
+    int id;int color_reversal; int generate_mode; int iteration_times;
+    double scale; int thread_id; uint8_t* p;int PIXEL_X;int PIXEL_Y;
+    double CENTER_X; double CENTER_Y; int use_thread;
+};
 
 double get_absolute_value(double x){
     if(x>0)return x;
@@ -158,137 +165,141 @@ double mandelbrot(double x, double y,int id,int color_reversal,int iteration_tim
     return 0;
 }
 
-void generate(char *file_path, int PIXEL_Y,
-              int PIXEL_X, double CENTER_X,
-              double CENTER_Y,
-              double SCALE_times,int id,
-              int color_reversal,int generate_mode,
-              int iteration_times)
-{
-    uint8_t data[(PIXEL_Y) * (PIXEL_X)*3];
-    uint8_t *p = data;
+void* multithread_generate(void* arg) {
+    struct Param tmp = *(struct Param*)arg;
 
-    double temp_i = (PIXEL_Y);
-    double temp_j = (PIXEL_X);
-    double temp_scale = 512.0 * (SCALE_times);
+    int thread_num = tmp.use_thread;
+    uint8_t* p = tmp.p;
 
-    for (int i = 0; i < temp_i; ++i)
-    {
-        for (int j = 0; j < temp_j; ++j)
-        {
 
-            uint8_t n = mandelbrot((CENTER_X)-temp_j / (2*( temp_scale)) + j / (temp_scale),
-                                   (CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
-                                   id,color_reversal,iteration_times) *255;
+    int one_part_of_temp_i = (tmp.PIXEL_Y ) / thread_num;
+    int temp_i_start = tmp.thread_id* one_part_of_temp_i;
+
+    p += temp_i_start* tmp.PIXEL_X*3;
+    int temp_i_end = temp_i_start + one_part_of_temp_i;
+    if (tmp.thread_id == thread_num-1) {
+        //处理不能被整除的情况(多出来的全部由最后一个线程渲染)
+        temp_i_end += tmp.PIXEL_Y % thread_num;
+    }
+
+    int temp_i = tmp.PIXEL_Y;
+    int temp_j = tmp.PIXEL_X;
+    double temp_scale = 512.0 * (tmp.scale);
+
+    for (int i = temp_i_start; i < temp_i_end; ++i){
+        for (int j = 0; j < temp_j; ++j){
+
+            uint8_t n = mandelbrot((tmp.CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                   (tmp.CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
+                                   tmp.id, tmp.color_reversal, tmp.iteration_times) * 255;
             //越接近mandelbrot集合内，则n值越高
-
-            switch(generate_mode){
+            switch (tmp.generate_mode) {
                 case 0:
-                    *p++ = 4*n;
-                    *p++ = 2*n;
+                    *p++ = 4 * n;
+                    *p++ = 2 * n;
                     *p++ = n;
                     break;
                 case 1:
-                    *p++ = 4*n;
+                    *p++ = 4 * n;
                     *p++ = n;
-                    *p++ = 2*n;
+                    *p++ = 2 * n;
                     break;
                 case 2:
-                    *p++ = 2*n;
-                    *p++ = 4*n;
+                    *p++ = 2 * n;
+                    *p++ = 4 * n;
                     *p++ = n;
                     break;
                 case 3:
                     *p++ = n;
-                    *p++ = 4*n;
-                    *p++ = 2*n;
+                    *p++ = 4 * n;
+                    *p++ = 2 * n;
                     break;
                 case 4:
                     *p++ = n;
-                    *p++ = 2*n;
-                    *p++ = 4*n;
+                    *p++ = 2 * n;
+                    *p++ = 4 * n;
                     break;
                 case 5:
-                    *p++ = 2*n;
+                    *p++ = 2 * n;
                     *p++ = n;
-                    *p++ = 4*n;
+                    *p++ = 4 * n;
                     break;
                 case 6:
-                    *p++ = 16*n;
-                    *p++ = 4*n;
+                    *p++ = 16 * n;
+                    *p++ = 4 * n;
                     *p++ = n;
                     break;
                 case 7:
-                    *p++ = 2*n;
-                    *p++ = 4*n;
-                    *p++ = 16*n;
+                    *p++ = 2 * n;
+                    *p++ = 4 * n;
+                    *p++ = 16 * n;
                     break;
                 case 8:
-                    *p++ = 8*n;
-                    *p++ = 16*n;
-                    *p++ = 2*n;
+                    *p++ = 8 * n;
+                    *p++ = 16 * n;
+                    *p++ = 2 * n;
                     break;
                 case 9:
-                    *p++ = 4*n;
-                    *p++ = 16*n;
+                    *p++ = 4 * n;
+                    *p++ = 16 * n;
                     *p++ = n;
                     break;
                 case 10:
-                    *p++ = 32*n;
-                    *p++ = 2*n;
-                    *p++ = 8*n;
+                    *p++ = 32 * n;
+                    *p++ = 2 * n;
+                    *p++ = 8 * n;
                     break;
                 case 11:
-                    *p++ = 8*n;
-                    *p++ = 64*n;
+                    *p++ = 8 * n;
+                    *p++ = 64 * n;
                     *p++ = n;
                     break;
                 case 12:
-                    *p++ = 32*n;
-                    *p++ = 64*n;
-                    *p++ = 4*n;
+                    *p++ = 32 * n;
+                    *p++ = 64 * n;
+                    *p++ = 4 * n;
                     break;
                 case 13:
-                    *p++ = 64*n;
-                    *p++ = 16*n;
-                    *p++ = 32*n;
+                    *p++ = 64 * n;
+                    *p++ = 16 * n;
+                    *p++ = 32 * n;
                     break;
                 case 14:
-                    *p++ = 8*n;
-                    *p++ = 16*n;
-                    *p++ = 64*n;
+                    *p++ = 8 * n;
+                    *p++ = 16 * n;
+                    *p++ = 64 * n;
                     break;
                 case 15:
-                    *p++ = 16*n;
-                    *p++ = 2*n;
-                    *p++ = 64*n;
+                    *p++ = 16 * n;
+                    *p++ = 2 * n;
+                    *p++ = 64 * n;
                     break;
                 case 16:
-                    *p++ = 64*n;
-                    *p++ = 32*n;
-                    *p++ = 8*n;
+                    *p++ = 64 * n;
+                    *p++ = 32 * n;
+                    *p++ = 8 * n;
                     break;
                 case 17:
-                    *p++ = 64*n;
-                    *p++ = 4*n;
-                    *p++ = 8*n;
+                    *p++ = 64 * n;
+                    *p++ = 4 * n;
+                    *p++ = 8 * n;
                     break;
                 case 18:
-                    *p++ = 32*n;
-                    *p++ = 64*n;
-                    *p++ = 16*n;
+                    *p++ = 32 * n;
+                    *p++ = 64 * n;
+                    *p++ = 16 * n;
                     break;
                 case 19:
-                    *p++ = 32*n;
-                    *p++ = 64*n;
-                    *p++ = 128*n;
+                    *p++ = 32 * n;
+                    *p++ = 64 * n;
+                    *p++ = 128 * n;
                     break;
                 case 20:
-                    *p++ = 128*n;
-                    *p++ = 4*n;
-                    *p++ = 30*n;
+                    *p++ = 128 * n;
+                    *p++ = 4 * n;
+                    *p++ = 30 * n;
                     break;
-                case -1 :
+                case -1:
                     if (n > 235)
                     {
                         *p++ = n;
@@ -346,10 +357,223 @@ void generate(char *file_path, int PIXEL_Y,
             }
         }
     }
+}
 
-    FILE *file = fopen(file_path, "wb");
-    svpng(file, (PIXEL_X), (PIXEL_Y), data, 0);
-    fclose(file);
+void generate(char *file_path, int PIXEL_Y,
+              int PIXEL_X, double CENTER_X,
+              double CENTER_Y,
+              double SCALE_times,int id,
+              int color_reversal,int generate_mode,
+              int iteration_times,int use_thread)
+{
+    uint8_t *data = (uint8_t *)malloc((PIXEL_Y) * (PIXEL_X) * 3);
+    if (use_thread>1&&PIXEL_Y>=10) {
+        pthread_t my_thread[10];
+
+        struct Param param1[10];
+        //这里暂时没想到更好的办法，先将就下(这里除了thread_id以外都可以只传1次)
+        for (int i = 0;i < use_thread;i++) {
+            param1[i].id = id;
+            param1[i].color_reversal = color_reversal;
+            param1[i].generate_mode = generate_mode;
+            param1[i].iteration_times = iteration_times;
+            param1[i].scale = SCALE_times;
+            param1[i].thread_id = i;
+            param1[i].p= data;
+            param1[i].PIXEL_X= PIXEL_X;
+            param1[i].PIXEL_Y= PIXEL_Y;
+            param1[i].CENTER_X= CENTER_X;
+            param1[i].CENTER_Y= CENTER_Y;
+            param1[i].use_thread= use_thread;
+            pthread_create(&my_thread[i], NULL, multithread_generate, &param1[i]);
+        }
+
+        for (int i = 0;i < use_thread;i++) {
+            pthread_join(my_thread[i], NULL);
+        }
+        FILE *file = fopen(file_path, "wb");
+        svpng(file, (PIXEL_X), (PIXEL_Y), data, 0);
+        fclose(file);
+        free(data);
+        return;
+    }
+
+    else {
+        uint8_t *p=data;
+        double temp_i = (PIXEL_Y);
+        double temp_j = (PIXEL_X);
+        double temp_scale = 512.0 * (SCALE_times);
+
+        for (int i = 0; i < temp_i; ++i) {
+            for (int j = 0; j < temp_j; ++j) {
+
+                uint8_t n = mandelbrot((CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                       (CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
+                                       id, color_reversal, iteration_times) * 255;
+                //越接近mandelbrot集合内，则n值越高
+
+                switch (generate_mode) {
+                    case 0:
+                        *p++ = 4 * n;
+                        *p++ = 2 * n;
+                        *p++ = n;
+                        break;
+                    case 1:
+                        *p++ = 4 * n;
+                        *p++ = n;
+                        *p++ = 2 * n;
+                        break;
+                    case 2:
+                        *p++ = 2 * n;
+                        *p++ = 4 * n;
+                        *p++ = n;
+                        break;
+                    case 3:
+                        *p++ = n;
+                        *p++ = 4 * n;
+                        *p++ = 2 * n;
+                        break;
+                    case 4:
+                        *p++ = n;
+                        *p++ = 2 * n;
+                        *p++ = 4 * n;
+                        break;
+                    case 5:
+                        *p++ = 2 * n;
+                        *p++ = n;
+                        *p++ = 4 * n;
+                        break;
+                    case 6:
+                        *p++ = 16 * n;
+                        *p++ = 4 * n;
+                        *p++ = n;
+                        break;
+                    case 7:
+                        *p++ = 2 * n;
+                        *p++ = 4 * n;
+                        *p++ = 16 * n;
+                        break;
+                    case 8:
+                        *p++ = 8 * n;
+                        *p++ = 16 * n;
+                        *p++ = 2 * n;
+                        break;
+                    case 9:
+                        *p++ = 4 * n;
+                        *p++ = 16 * n;
+                        *p++ = n;
+                        break;
+                    case 10:
+                        *p++ = 32 * n;
+                        *p++ = 2 * n;
+                        *p++ = 8 * n;
+                        break;
+                    case 11:
+                        *p++ = 8 * n;
+                        *p++ = 64 * n;
+                        *p++ = n;
+                        break;
+                    case 12:
+                        *p++ = 32 * n;
+                        *p++ = 64 * n;
+                        *p++ = 4 * n;
+                        break;
+                    case 13:
+                        *p++ = 64 * n;
+                        *p++ = 16 * n;
+                        *p++ = 32 * n;
+                        break;
+                    case 14:
+                        *p++ = 8 * n;
+                        *p++ = 16 * n;
+                        *p++ = 64 * n;
+                        break;
+                    case 15:
+                        *p++ = 16 * n;
+                        *p++ = 2 * n;
+                        *p++ = 64 * n;
+                        break;
+                    case 16:
+                        *p++ = 64 * n;
+                        *p++ = 32 * n;
+                        *p++ = 8 * n;
+                        break;
+                    case 17:
+                        *p++ = 64 * n;
+                        *p++ = 4 * n;
+                        *p++ = 8 * n;
+                        break;
+                    case 18:
+                        *p++ = 32 * n;
+                        *p++ = 64 * n;
+                        *p++ = 16 * n;
+                        break;
+                    case 19:
+                        *p++ = 32 * n;
+                        *p++ = 64 * n;
+                        *p++ = 128 * n;
+                        break;
+                    case 20:
+                        *p++ = 128 * n;
+                        *p++ = 4 * n;
+                        *p++ = 30 * n;
+                        break;
+                    case -1 :
+                        if (n > 235) {
+                            *p++ = n;
+                            *p++ = n;
+                            *p++ = n;
+                        } //黑白  数字越大则越透明
+                        else if (n > 200) {
+                            *p++ = 0;
+                            *p++ = n;
+                            *p++ = 0;
+                        } //绿
+                        else if (n > 160) {
+                            *p++ = n + 20;
+                            *p++ = n;
+                            *p++ = 0;
+                        } //黄
+                        else if (n > 120) {
+                            *p++ = 0;
+                            *p++ = 0;
+                            *p++ = n + 90.0;
+                        } //浅蓝
+                        else if (n > 80) {
+                            *p++ = 0;
+                            *p++ = 0;
+                            *p++ = n + 40.0;
+                        } //深蓝
+                        else if (n > 40) {
+                            *p++ = n;
+                            *p++ = 0;
+                            *p++ = n + 50.0;
+                        } //紫
+                        else if (n > 10) {
+                            *p++ = n + 80.0;
+                            *p++ = 0;
+                            *p++ = 0;
+                        } // 红
+                        else {
+                            *p++ = n;
+                            *p++ = 0;
+                            *p++ = 0;
+                        } //红，但不加鲜艳度
+                        break;
+                    default:
+                        *p++ = n;
+                        *p++ = n;
+                        *p++ = n;
+                        break;
+                }
+            }
+        }
+        FILE *file = fopen(file_path, "wb");
+        svpng(file, (PIXEL_X), (PIXEL_Y), data, 0);
+        fclose(file);
+        free(data);
+        return;
+    }
 }
 
 
@@ -359,8 +583,8 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz, jst
                                                   jdouble center_x, jdouble center_y,
                                                   jdouble scale_times,jint fractal_id,
                                                   jint color_reversal,jint generate_mode,
-                                                  jint iteration_times) {
+                                                  jint iteration_times,jint use_thread) {
     char *file_path = (*env)->GetStringUTFChars(env, path, JNI_FALSE);
     generate(file_path, screen_height, screen_width, center_x, center_y,
-            scale_times,fractal_id,color_reversal,generate_mode,iteration_times);
+            scale_times,fractal_id,color_reversal,generate_mode,iteration_times,use_thread);
 }

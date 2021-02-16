@@ -77,8 +77,8 @@
                     android:id="@+id/fractal_more_btn3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="反转"
-                    android:onClick="reverse"
+                    android:text="渲染模式+1"
+                    android:onClick="change_generate_mode"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/fractal_more_btn2"
                     app:layout_constraintEnd_toEndOf="@+id/fractal_more_btn4" />
@@ -86,16 +86,16 @@
                     android:id="@+id/fractal_more_btn4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="更改渲染模式"
+                    android:text="渲染反转"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/fractal_more_btn3"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:onClick="change_generate_mode"/>
+                    android:onClick="reverse"/>
                 <Button
                     android:id="@+id/fractal_more_btn5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="迭代次数x2"
+                    android:text="迭代x2"
                     app:layout_constraintTop_toBottomOf="@+id/fractal_more_btn1"
                     app:layout_constraintStart_toStartOf="@+id/fractal_more_btn1"
                     app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn6"
@@ -104,11 +104,31 @@
                     android:id="@+id/fractal_more_btn6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="迭代次数/2"
+                    android:text="迭代/2"
                     app:layout_constraintTop_toTopOf="@+id/fractal_more_btn5"
                     app:layout_constraintStart_toEndOf="@+id/fractal_more_btn5"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn7"
                     android:onClick="iteration_times_half"/>
+                <Button
+                    android:id="@+id/fractal_more_btn7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="迭代+1"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn5"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn6"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn8"
+                    android:onClick="iteration_times_plus_one"/>
+                <!-- android:textStyle="italic"即斜体，用来表示这个按钮不会改变图片文件本身-->
+                <Button
+                    android:id="@+id/fractal_more_btn8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="italic"
+                    android:text="显示反转"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn5"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn7"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:onClick="display_color_reverse"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -430,7 +450,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxHeight="20dp"
-                android:text="反转=false"
+                android:text="反转=false/false"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
