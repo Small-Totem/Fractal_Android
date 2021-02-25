@@ -18,6 +18,12 @@
             app:defaultValue="true"
             app:iconSpaceReserved="false"
             />
+        <SwitchPreference
+            app:key="auto_iteration_Preference"
+            app:title="自适应迭代"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            />
         <ListPreference
             app:key="fractal_id_Preference"
             app:title="图形id"

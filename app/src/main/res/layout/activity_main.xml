@@ -54,9 +54,19 @@
                 android:alpha="0.75"
                 android:background="@color/back_for_layout">
                 <Button
+                    android:id="@+id/fractal_more_btn0"
+                    android:text="自适应迭代"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="iteration_auto"
+                    />
+                <Button
                     android:id="@+id/fractal_more_btn1"
                     android:text="横向x2"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_more_btn0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn2"
                     android:layout_width="wrap_content"
@@ -66,7 +76,7 @@
                 <Button
                     android:id="@+id/fractal_more_btn2"
                     android:text="纵向x2"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn1"
                     app:layout_constraintStart_toEndOf="@+id/fractal_more_btn1"
                     app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn3"
                     android:layout_width="wrap_content"
@@ -79,15 +89,15 @@
                     android:layout_height="wrap_content"
                     android:text="渲染模式+1"
                     android:onClick="change_generate_mode"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn1"
                     app:layout_constraintStart_toEndOf="@+id/fractal_more_btn2"
-                    app:layout_constraintEnd_toEndOf="@+id/fractal_more_btn4" />
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn4" />
                 <Button
                     android:id="@+id/fractal_more_btn4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="渲染反转"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn1"
                     app:layout_constraintStart_toEndOf="@+id/fractal_more_btn3"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:onClick="reverse"/>
@@ -97,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:text="迭代x2"
                     app:layout_constraintTop_toBottomOf="@+id/fractal_more_btn1"
-                    app:layout_constraintStart_toStartOf="@+id/fractal_more_btn1"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn6"
                     android:onClick="iteration_times_double"/>
                 <Button
@@ -426,7 +436,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxHeight="20dp"
-                android:text="迭代次数=0"
+                android:text="迭代=0"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -438,7 +448,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxHeight="20dp"
-                android:text="缩放倍率=0"
+                android:text="缩放=0"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintStart_toEndOf="@+id/fractal_text_iteration"

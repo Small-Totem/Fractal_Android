@@ -20,6 +20,7 @@ public class SaveData {
             double center_x, double center_y, double scale_times,
             double pixel_times, double generate_now_quality, boolean color_reversal,
             int fractal_id, int generate_mode, int iteration_times,
+            boolean iteration_auto, int auto_iteration_max,
             Context context,boolean flag_use_data){
         SharedPreferences.Editor e = share(context).edit();
         if(flag_use_data){
@@ -29,9 +30,11 @@ public class SaveData {
             putDouble(e,"pixel_times_true",pixel_times);
             putDouble(e,"generate_now_quality_true",generate_now_quality);
             e.putBoolean("color_reversal_true",color_reversal);
+            e.putBoolean("iteration_auto_true",iteration_auto);
             e.putInt("fractal_id_true",fractal_id);
             e.putInt("generate_mode_true",generate_mode);
             e.putInt("iteration_times_true",iteration_times);
+            e.putInt("auto_iteration_max_true",auto_iteration_max);
         }
         else {
             putDouble(e,"center_x_false",center_x);
@@ -40,9 +43,11 @@ public class SaveData {
             putDouble(e,"pixel_times_false",pixel_times);
             putDouble(e,"generate_now_quality_false",generate_now_quality);
             e.putBoolean("color_reversal_false",color_reversal);
+            e.putBoolean("iteration_auto_false",iteration_auto);
             e.putInt("fractal_id_false",fractal_id);
             e.putInt("generate_mode_false",generate_mode);
             e.putInt("iteration_times_false",iteration_times);
+            e.putInt("auto_iteration_max_false",auto_iteration_max);
         }
         e.apply();
     }

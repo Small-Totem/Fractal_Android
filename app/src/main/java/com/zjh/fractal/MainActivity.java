@@ -33,12 +33,14 @@ public class MainActivity extends AppCompatActivity {
     static int generate_mode = 0;// 渲染模式
     static int iteration_times = 128;// 迭代次数
     static int use_thread=1;//使用的线程数(测试)  不得大于10 可等于
+    static int auto_iteration_max = 2000;
 
     static boolean flag_if_generate_now = true;
     static boolean flag_should_reload = true;// 在设置界面中调用，是否重新渲染，默认true
     static boolean color_reversal = true;// 渲染颜色反转
     static boolean display_color_reversal = false;// 显示反转
     static boolean flag_should_load_from_storage = false;// 在改日夜模式后为true，是否加载图片,默认false
+    static boolean auto_iteration = false;
     static boolean flag_use_data;/*
                                   * 为了实现每次更新信息都暂存数据（用于恢复上次关闭时的参数），使用
                                   * 两份SharedPreferences保存数据（称为A和B），当进入程序后读取到的flag_use_data为true时，
@@ -76,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
         screenHeight = dm.heightPixels;
 
         //读取使用的线程数
-        String thread_str=getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).getString("thread_Preference","不使用多线程");
+        String thread_str=getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE)
+                .getString("thread_Preference",getResources().getStringArray(R.array.thread)[0]);
         final String[] str= getResources().getStringArray(R.array.thread);
         for(int i=0;i<str.length;i++){
             if(str[i].equals(thread_str)){
@@ -90,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         //设置SharedPreferences中的日夜模式为夜间(即启动时默认为夜间模式)
-        getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit().putBoolean("night_mode_Preference",true).apply();
+        getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
+                .putBoolean("night_mode_Preference",true).apply();
 
         SwitchCompat switch1 = findViewById(R.id.fractal_switch1);
         switch1.setOnCheckedChangeListener((buttonView, isChecked) -> flag_if_generate_now = isChecked);
@@ -172,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
         GenerateFractal(file_path, (int) (screenHeight * pixel_times), (int) (screenWidth * pixel_times), center_x,
                 center_y, scale_times * pixel_times, fractal_id, get_color_reversal(), generate_mode,
-                iteration_times,use_thread);
+                iteration_times,use_thread,get_iteration_auto_max());
 
         ImageView i = findViewById(R.id.fractal);
         Bitmap bitmap = ImageProcess.GetLocalBitmap(file_path);
@@ -181,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
     public native void GenerateFractal(String path, int screen_height, int screen_width, double center_x,
             double center_y, double SCALE_times, int fractal_id, int color_reversal, int generate_mode,
-            int iteration_times,int use_thread);
+            int iteration_times,int use_thread,int auto_iteration_max);
 
     private int get_color_reversal() {
         if (color_reversal)
@@ -189,6 +193,14 @@ public class MainActivity extends AppCompatActivity {
         else
             return 0;
     }
+
+    private int get_iteration_auto_max() {
+        if (auto_iteration)
+            return auto_iteration_max;
+        else
+            return 0;
+    }
+
 
     public void update_info() {
         display_color_reversal=false;
@@ -205,11 +217,13 @@ public class MainActivity extends AppCompatActivity {
         String str_x = "X=" + center_x;
         String str_y = "Y=" + center_y;
         String str_pixel = "渲染倍率=" + pixel_times;
-        String str_scale = "缩放倍率=" + scale_times;
+        String str_scale = "缩放=" + scale_times;
         String str_reversal = "反转=" + color_reversal+"/"+display_color_reversal;
         String str_generate_mode = "渲染模式=" + generate_mode;
         String str_generate_id = "ID=" + fractal_id;
-        String str_iteration = "迭代次数=" + iteration_times;
+        String  str_iteration;
+        if(auto_iteration) str_iteration="迭代="+ iteration_times+"->"+auto_iteration_max;
+        else str_iteration= "迭代="+ iteration_times;
 
         text_x.setText(str_x);
         text_y.setText(str_y);
@@ -220,10 +234,21 @@ public class MainActivity extends AppCompatActivity {
         text_generate_id.setText(str_generate_id);
         text_text_iteration.setText(str_iteration);
 
-        Button fractal_double = findViewById(R.id.fractal_btn3);
-        Button iteration_double = findViewById(R.id.fractal_more_btn5);
-        fractal_double.setEnabled(scale_times <= scale_max); // 小于4E12时才准放大
-        iteration_double.setEnabled(iteration_times < iteration_max);
+        Button fractal_double_button = findViewById(R.id.fractal_btn3);
+        Button iteration_double_button = findViewById(R.id.fractal_more_btn5);
+        Button generate_color_reverse_button = findViewById(R.id.fractal_more_btn4);
+        Button display_color_reverse_button = findViewById(R.id.fractal_more_btn8);
+        Button auto_iteration_button = findViewById(R.id.fractal_more_btn0);
+
+
+
+        fractal_double_button.setEnabled(scale_times <= scale_max); // 小于4E12时才准放大
+        iteration_double_button.setEnabled(iteration_times < iteration_max);
+        if(color_reversal) generate_color_reverse_button.setTextColor(getResources().getColor(R.color.light_blue));
+        else generate_color_reverse_button.setTextColor(getResources().getColor(R.color.text_color));
+        if(auto_iteration) auto_iteration_button.setTextColor(getResources().getColor(R.color.light_blue));
+        else auto_iteration_button.setTextColor(getResources().getColor(R.color.text_color));
+        display_color_reverse_button.setTextColor(getResources().getColor(R.color.text_color));
 
         getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
                 .putBoolean("color_reverse_Preference", color_reversal).apply();
@@ -250,9 +275,12 @@ public class MainActivity extends AppCompatActivity {
                     .putString("generate_mode_Preference", str2[generate_mode]).apply();
         }
 
-        SaveData.save_data(center_x, center_y, scale_times, pixel_times, generate_now_quality, color_reversal,
-                fractal_id, generate_mode, iteration_times, getApplicationContext(), flag_use_data);
+        SaveData.save_data(center_x, center_y, scale_times, pixel_times, generate_now_quality,
+                color_reversal, fractal_id, generate_mode, iteration_times,auto_iteration
+                ,auto_iteration_max, getApplicationContext(), flag_use_data);
     }
+
+
 
     //////////////////////////////////
     /// onclick函数
@@ -373,6 +401,9 @@ public class MainActivity extends AppCompatActivity {
     }
     public void display_color_reverse(View v) {
     //显示反转 而非渲染反转
+        if(display_color_reversal) ((Button)v).setTextColor(getResources().getColor(R.color.text_color));
+        else ((Button)v).setTextColor(getResources().getColor(R.color.light_blue));
+
         ImageView i = findViewById(R.id.fractal);
         Bitmap bitmap = ImageProcess.GetLocalBitmap(file_path);
         if(display_color_reversal){
@@ -385,5 +416,11 @@ public class MainActivity extends AppCompatActivity {
         TextView text_reversal = findViewById(R.id.fractal_text_reversal);
         String str_reversal = "反转=" + color_reversal+"/"+display_color_reversal;
         text_reversal.setText(str_reversal);
+    }
+    public void iteration_auto(View v) {
+        auto_iteration =!auto_iteration;
+
+        if (flag_if_generate_now)
+            generate(generate_now_quality);
     }
 }

@@ -49,6 +49,7 @@ public class SettingsActivity extends AppCompatActivity {
         Preference samples_Preference;
         Preference about_fractal_Preference;
         Preference thread_Preference;
+        Preference auto_iteration_Preference;
 
         boolean first_click=true;
         @Override
@@ -68,17 +69,18 @@ public class SettingsActivity extends AppCompatActivity {
             samples_Preference              =findPreference("samples_Preference");
             about_fractal_Preference        =findPreference("about_fractal_Preference");
             thread_Preference               =findPreference("thread_Preference");
+            auto_iteration_Preference       =findPreference("auto_iteration_Preference");
 
             night_mode_Preference.setOnPreferenceClickListener(this);
             color_reverse_Preference.setOnPreferenceClickListener(this);
             read_data_Preference.setOnPreferenceClickListener(this);
             open_picture_Preference.setOnPreferenceClickListener(this);
             about_fractal_Preference.setOnPreferenceClickListener(this);
+            auto_iteration_Preference.setOnPreferenceClickListener(this);
             fractal_id_Preference.setOnPreferenceChangeListener(this);
             generate_mode_Preference.setOnPreferenceChangeListener(this);
             samples_Preference.setOnPreferenceChangeListener(this);
             thread_Preference.setOnPreferenceChangeListener(this);
-
         }
 
         @Override
@@ -94,6 +96,10 @@ public class SettingsActivity extends AppCompatActivity {
             }
             else if(preference.equals(color_reverse_Preference)){
                 MainActivity.color_reversal=!MainActivity.color_reversal;
+                MainActivity.flag_should_reload=true;
+            }
+            else if(preference.equals(auto_iteration_Preference)){
+                MainActivity.auto_iteration=!MainActivity.auto_iteration;
                 MainActivity.flag_should_reload=true;
             }
             else if(preference.equals(read_data_Preference)){
@@ -199,9 +205,11 @@ public class SettingsActivity extends AppCompatActivity {
             //MainActivity.generate_now_quality=SaveData.get_data_double(c,"generate_now_quality");
             MainActivity.generate_now_quality = 0.3;
             MainActivity.color_reversal = SaveData.get_data_boolean(c, "color_reversal_true");
+            MainActivity.auto_iteration = SaveData.get_data_boolean(c,"iteration_auto_true");
             MainActivity.fractal_id = SaveData.get_data_int(c, "fractal_id_true");
             MainActivity.generate_mode = SaveData.get_data_int(c, "generate_mode_true");
             MainActivity.iteration_times = SaveData.get_data_int(c, "iteration_times_true");
+            MainActivity.auto_iteration_max =SaveData.get_data_int(c, "auto_iteration_max_true");
         }
         else{
             MainActivity.center_x = SaveData.get_data_double(c, "center_x_false");
@@ -211,9 +219,11 @@ public class SettingsActivity extends AppCompatActivity {
             //MainActivity.generate_now_quality=SaveData.get_data_double(c,"generate_now_quality");
             MainActivity.generate_now_quality = 0.3;
             MainActivity.color_reversal = SaveData.get_data_boolean(c, "color_reversal_false");
+            MainActivity.auto_iteration = SaveData.get_data_boolean(c,"iteration_auto_false");
             MainActivity.fractal_id = SaveData.get_data_int(c, "fractal_id_false");
             MainActivity.generate_mode = SaveData.get_data_int(c, "generate_mode_false");
             MainActivity.iteration_times = SaveData.get_data_int(c, "iteration_times_false");
+            MainActivity.auto_iteration_max =SaveData.get_data_int(c, "auto_iteration_max_false");
         }
     }
 
@@ -449,6 +459,7 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
         }
     }
+
     //////////////////////////////////
     ///onclick函数
     public void settings_confirm(View v){
@@ -460,6 +471,7 @@ public class SettingsActivity extends AppCompatActivity {
         EditText et4=findViewById(R.id.preferences_edit4);
         EditText et5=findViewById(R.id.preferences_edit5);
         EditText et6=findViewById(R.id.preferences_edit6);
+        EditText et7=findViewById(R.id.preferences_edit7);
 
         //if(!"java.lang.NumberFormatException: empty String".equals(e.toString()))
         //显然这里的try,catch不应该这么搞，但是不知道标准的用法是怎样的，暂时将就下
@@ -560,6 +572,24 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
+        try {
+            int i=Integer.parseInt(et7.getText().toString());
+            if(i<=0||i>MainActivity.iteration_max){
+                et7.setTextColor(getColor(R.color.red));
+                flag_return=true;
+            }
+            else {
+                MainActivity.auto_iteration_max = i;
+                et7.setTextColor(getResources().getColor(R.color.text_color));
+            }
+        }
+        catch(NumberFormatException e){
+            if(!"java.lang.NumberFormatException: For input string: \"\"".equals(e.toString())) {
+                et7.setTextColor(getColor(R.color.red));
+                flag_return=true;
+            }
+        }
+
         if(flag_return) return;
 
         ((Button)v).setText("正在渲染");
@@ -573,6 +603,7 @@ public class SettingsActivity extends AppCompatActivity {
         EditText et4=findViewById(R.id.preferences_edit4);
         EditText et5=findViewById(R.id.preferences_edit5);
         EditText et6=findViewById(R.id.preferences_edit6);
+        EditText et7=findViewById(R.id.preferences_edit7);
 
         et1.setText(Double.toString(MainActivity.center_x));
         et2.setText(Double.toString(MainActivity.center_y));
@@ -580,6 +611,7 @@ public class SettingsActivity extends AppCompatActivity {
         et4.setText(Double.toString(MainActivity.pixel_times));
         et5.setText(Double.toString(MainActivity.generate_now_quality));
         et6.setText(Integer.toString(MainActivity.iteration_times));
+        et7.setText(Integer.toString(MainActivity.auto_iteration_max));
     }
 
     public void settings_clear(View v){
@@ -589,6 +621,7 @@ public class SettingsActivity extends AppCompatActivity {
         EditText et4=findViewById(R.id.preferences_edit4);
         EditText et5=findViewById(R.id.preferences_edit5);
         EditText et6=findViewById(R.id.preferences_edit6);
+        EditText et7=findViewById(R.id.preferences_edit7);
 
         et1.setText("");
         et2.setText("");
@@ -596,5 +629,6 @@ public class SettingsActivity extends AppCompatActivity {
         et4.setText("");
         et5.setText("");
         et6.setText("");
+        et7.setText("");
     }
 }

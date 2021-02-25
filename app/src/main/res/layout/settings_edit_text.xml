@@ -120,6 +120,7 @@
             android:inputType="numberDecimal"
             />
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -142,6 +143,30 @@
             android:imeOptions="actionDone"
             />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_color"
+            android:text="自适应迭代上限="
+            android:textSize="17sp"/>
+        <EditText
+            android:id="@+id/preferences_edit7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="[Int][1~16384]"
+            android:inputType="number"
+            android:imeOptions="actionDone"
+            />
+    </LinearLayout>
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
