@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
         String str_generate_mode = "渲染模式=" + generate_mode;
         String str_generate_id = "ID=" + fractal_id;
         String  str_iteration;
-        if(auto_iteration) str_iteration="迭代="+ iteration_times+"->"+auto_iteration_max;
+        if(auto_iteration&&iteration_times<auto_iteration_max) str_iteration="迭代="+ iteration_times+"->"+auto_iteration_max;
         else str_iteration= "迭代="+ iteration_times;
 
         text_x.setText(str_x);
@@ -252,6 +252,9 @@ public class MainActivity extends AppCompatActivity {
 
         getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
                 .putBoolean("color_reverse_Preference", color_reversal).apply();
+        getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
+                .putBoolean("auto_iteration_Preference", auto_iteration).apply();
+
 
         final String[] str1 = getResources().getStringArray(R.array.fractal_id);
         final String[] str2 = getResources().getStringArray(R.array.generate_mode);

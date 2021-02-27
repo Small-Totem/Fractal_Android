@@ -7,10 +7,13 @@
 #include <math.h>
 #include <pthread.h>
 
-struct Param {
+struct param_for_thread {
     int id;int color_reversal; int generate_mode; int iteration_times;
     double scale; int thread_id; uint8_t* p;int PIXEL_X;int PIXEL_Y;
     double CENTER_X; double CENTER_Y; int use_thread;int auto_iteration_max;
+};
+struct param_for_auto_iteration {
+    double a, b, n;
 };
 
 double get_absolute_value(double x){
@@ -18,151 +21,163 @@ double get_absolute_value(double x){
     else return -x;
 }
 
-double mandelbrot(double x, double y,int id,int color_reversal,int iteration_times)
-{
-    double a = x, b = y;
+struct param_for_auto_iteration mandelbrot_continue
+        (double x, double y,double a, double b,
+         int id,int color_reversal,int iteration_start_num,int iteration_end_num){
+    struct param_for_auto_iteration param;
+    param.n=0;
     switch(id){
         // x^2
         case 0:
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double c = a*a-b*b +x, d = 2*a*b +y;
                 a =c, b = d;
                 if (a * a + b * b >4) {
-                    if (color_reversal) { return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
         case 1:
             //x^3
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double  c = a*a*a-3*a*b*b + x,d = 3*a*a*b-b*b*b + y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
 
         case 2:
             // x^4
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double  c = a*a*a*a-6*a*a*b*b+b*b*b*b + x,d = 4*a*a*a*b-4*b*b*b*a + y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
         case 3:
             // x^4+x^3+x^2
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double  c = a*a*a*a-6*a*a*b*b+b*b*b*b+a*a*a-3*a*b*b+a*a-b*b+x,
                         d = 4*a*a*a*b-4*b*b*b*a+3*a*a*b-b*b*b+2*a*b+y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
 
         case 4:
             //x^2-x^3
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double c = a * a - b * b-(a * a * a - 3*a*b*b)+ x, d = 2 * a * b -(3*a*a*b-b*b*b)+ y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
 
         case 5:
             //The Burning Ship fractal
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double c =a * a - b * b  + x, d = 2*get_absolute_value(a)*get_absolute_value(b)  + y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
 
         case 6:
             //无意义的混沌
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double c = a * a - b * b / a+ x, d = 2 * a * b + y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) { return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
         case 7:
             // 一个混沌
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double  c = a * a - b * b + x, d = 2 * a * b/(a+b) + y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
         case 8:
             //混沌
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double c =  a*(a+b) - b*(a-b) + x, d = 2*a * b/(a+b)*(a-b) + y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i /(double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
         case 9:
             //茱莉亚集合
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double c = a*a-b*b - 0.70176, d = 2*a*b -0.3842;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i /(double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
         case 10:
             //牛顿分形 f(z)=z^3-1 x_n+1=x_n-f(x_n)/f'(x_n)
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double c =a-(2*a*b*(3*pow(a,2)*b-pow(b,3))+(pow(a,2)-pow(b,2))*((-3*a*pow(b,2))+pow(a,3)-1))/(3*pow((pow(b,2)+pow(a,2)),2)),
-                d =b-((pow(a,2)-pow(b,2))*(3*pow(a,2)*b-pow(b,3))-2*a*b*((-3*a*pow(b,2))+pow(a,3)-1))/(3*pow((pow(b,2)+pow(a,2)),2));
+                        d =b-((pow(a,2)-pow(b,2))*(3*pow(a,2)*b-pow(b,3))-2*a*b*((-3*a*pow(b,2))+pow(a,3)-1))/(3*pow((pow(b,2)+pow(a,2)),2));
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i /(double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
         case -1://(一个圆，用来分析渲染模式)
-            for (int i = 0; i < iteration_times; ++i) {
+            for (int i = iteration_start_num; i <= iteration_end_num; i++) {
                 double c = a+x, d = b+y;
                 a = c, b = d;
                 if (a * a + b * b > 4) {
-                    if (color_reversal) {return i / (double)iteration_times; }
-                    else return 1 - i / (double)iteration_times;
+                    param.n=i / (double)iteration_end_num;
+                    break;
                 }
             }
             break;
         default:
             break;
     }
-    return 0;
+
+    if(!color_reversal&&param.n!=0) { param.n=1-param.n; }
+    param.a=a;
+    param.b=b;
+    return param;
+}
+
+struct param_for_auto_iteration mandelbrot
+        (double x, double y,int id,int color_reversal,int iteration_times)
+{
+    return mandelbrot_continue(x,y,x,y,id,color_reversal,1,iteration_times);
 }
 
 void write_data(uint8_t* p ,int n,int generate_mode){
@@ -331,7 +346,7 @@ void write_data(uint8_t* p ,int n,int generate_mode){
 }
 
 void* multithread_generate(void* arg) {
-    struct Param tmp = *(struct Param*)arg;
+    struct param_for_thread tmp = *(struct param_for_thread*)arg;
 
     int thread_num = tmp.use_thread;
     uint8_t* p = tmp.p;
@@ -353,20 +368,28 @@ void* multithread_generate(void* arg) {
 
     for (int i = temp_i_start; i < temp_i_end; ++i){
         for (int j = 0; j < temp_j; ++j){
+            struct param_for_auto_iteration param_continue=mandelbrot
+                    ((tmp.CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                            (tmp.CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
+                            tmp.id, tmp.color_reversal, tmp.iteration_times);
 
-            uint8_t n = mandelbrot((tmp.CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                   (tmp.CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
-                                   tmp.id, tmp.color_reversal, tmp.iteration_times) * 255;
+            uint8_t n = param_continue.n * 255;
 
-            if(tmp.auto_iteration_max>0){
-                int it=tmp.iteration_times;
-                while(it*5<tmp.auto_iteration_max) {
+
+            //自适应迭代
+            if(tmp.auto_iteration_max>0&&n==0&&tmp.iteration_times<tmp.auto_iteration_max){
+                int it_start=tmp.iteration_times;
+                int it_end=it_start*5;
+                while(it_end<tmp.auto_iteration_max) {
                     //对黑色的地方提高迭代次数
                     if (n == 0) {
-                        it*=5;
-                        n = mandelbrot((tmp.CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                       (tmp.CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
-                                       tmp.id, tmp.color_reversal, it) * 255;
+                        param_continue = mandelbrot_continue((tmp.CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                                             (tmp.CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
+                                                             param_continue.a, param_continue.b, tmp.id, tmp.color_reversal,
+                                                             it_start, it_end);
+                        n= param_continue.n * 255;
+                        it_start=it_end;
+                        it_end*=5;
                     }
                     else{
                         break;
@@ -374,9 +397,10 @@ void* multithread_generate(void* arg) {
                 }
                 if (n == 0) {
                     //对还是黑色的地方进行最后一次迭代
-                    n = mandelbrot((tmp.CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                   (tmp.CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
-                                   tmp.id, tmp.color_reversal, tmp.auto_iteration_max) * 255;
+                    n = mandelbrot_continue((tmp.CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                            (tmp.CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
+                                            param_continue.a, param_continue.b, tmp.id, tmp.color_reversal,
+                                            it_start, tmp.auto_iteration_max).n * 255;
                 }
             }
 
@@ -386,13 +410,10 @@ void* multithread_generate(void* arg) {
     }
 }
 
-void generate(char *file_path, int PIXEL_Y,
-              int PIXEL_X, double CENTER_X,
-              double CENTER_Y,
-              double SCALE_times,int id,
-              int color_reversal,int generate_mode,
-              int iteration_times,int use_thread,
-              int auto_iteration_max)
+void generate(char *file_path, int PIXEL_Y,int PIXEL_X,
+        double CENTER_X,double CENTER_Y,double SCALE_times,
+        int id,int color_reversal,int generate_mode,
+        int iteration_times,int use_thread,int auto_iteration_max)
 {
     uint8_t *data = (uint8_t *)malloc((PIXEL_Y) * (PIXEL_X) * 3);
 
@@ -400,7 +421,7 @@ void generate(char *file_path, int PIXEL_Y,
     if (use_thread>1&&PIXEL_Y>=10) {
         pthread_t my_thread[10];
 
-        struct Param param1[10];
+        struct param_for_thread param1[10];
         //这里暂时没想到更好的办法，先将就下(这里除了thread_id以外都可以只传1次)
         for (int i = 0;i < use_thread;i++) {
             param1[i].id = id;
@@ -438,21 +459,27 @@ void generate(char *file_path, int PIXEL_Y,
 
         for (int i = 0; i < temp_i; ++i) {
             for (int j = 0; j < temp_j; ++j) {
+                struct param_for_auto_iteration param_continue=mandelbrot
+                        ((CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                        (CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
+                        id, color_reversal, iteration_times);
 
-                uint8_t n = mandelbrot((CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                       (CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
-                                       id, color_reversal, iteration_times) * 255;
+                uint8_t n = param_continue.n * 255;
                 //越接近mandelbrot集合内，则n值越高   但在集合内,n=0   n=255时 为白
 
-                if(auto_iteration_max>0){
-                    int it=iteration_times;
-                    while(it*5<auto_iteration_max) {
+                if(auto_iteration_max>0&&n==0&&iteration_times<auto_iteration_max){
+                    int it_start=iteration_times;
+                    int it_end=it_start*5;
+                    while(it_end<auto_iteration_max) {
                         //对黑色的地方提高迭代次数
                         if (n == 0) {
-                            it*=5;
-                            n = mandelbrot((CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                           (CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
-                                           id, color_reversal, it) * 255;
+                            param_continue = mandelbrot_continue((CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                                                 (CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
+                                                                 param_continue.a, param_continue.b, id, color_reversal,
+                                                                 it_start, it_end);
+                            n= param_continue.n * 255;
+                            it_start=it_end;
+                            it_end*=5;
                         }
                         else{
                             break;
@@ -460,9 +487,10 @@ void generate(char *file_path, int PIXEL_Y,
                     }
                     if (n == 0) {
                         //对还是黑色的地方进行最后一次迭代
-                        n = mandelbrot((CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                       (CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
-                                       id, color_reversal, auto_iteration_max) * 255;
+                        n = mandelbrot_continue((CENTER_X) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                                (CENTER_Y) - temp_i / (2 * temp_scale) + i / temp_scale,
+                                                param_continue.a, param_continue.b, id, color_reversal,
+                                                it_start, auto_iteration_max).n * 255;
                     }
                 }
 
