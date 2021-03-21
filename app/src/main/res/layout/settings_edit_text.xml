@@ -72,7 +72,7 @@
             android:id="@+id/preferences_edit3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="[Double][0~2E12]"
+            android:hint="[Double][0~4E12]"
             android:inputType="numberDecimal"
             />
     </LinearLayout>
@@ -138,9 +138,8 @@
             android:id="@+id/preferences_edit6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="[Int][1~16384]"
+            android:hint="[Int][1~65536]"
             android:inputType="number"
-            android:imeOptions="actionDone"
             />
     </LinearLayout>
 
@@ -161,7 +160,7 @@
             android:id="@+id/preferences_edit7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="[Int][1~16384]"
+            android:hint="[Int][1~65536]"
             android:inputType="number"
             android:imeOptions="actionDone"
             />

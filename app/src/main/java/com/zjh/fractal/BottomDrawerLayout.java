@@ -30,11 +30,11 @@ public class BottomDrawerLayout extends ViewGroup {
     private int mBottomHeight1;
     private int mDrawerHeight1;
     private int mParentHeight1;
-    private int mCurTop2=-1;
+    private final int mCurTop2=-1;
     private float mDragOffset1 = 1;
 
-    private boolean isUnderBottomView = false;
-    private boolean isUnderDrawerView = false;
+    private final boolean isUnderBottomView = false;
+    private final boolean isUnderDrawerView = false;
 
     private boolean flag_is_maximize1 = false;
     private OnDrawerStatusChanged onDrawerStatusChanged;

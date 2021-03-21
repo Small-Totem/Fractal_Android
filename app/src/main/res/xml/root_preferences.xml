@@ -58,12 +58,37 @@
             app:defaultValue="true"
             app:iconSpaceReserved="false"
             />
+        <SwitchPreference
+            app:key="transition_Preference"
+            app:title="图像渐变动画"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            />
    </PreferenceCategory>
 
     <PreferenceCategory
+        app:title="渲染"
+        app:iconSpaceReserved="false">
+        <SwitchPreference
+            app:key="generate_info_Preference"
+            app:title="监视渲染信息"
+            app:summary="开启会占用一点点性能"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            />
+        <ListPreference
+            app:key="thread_Preference"
+            app:title="多线程渲染"
+            app:dialogTitle="多线程渲染"
+            app:entries="@array/thread"
+            app:entryValues="@array/thread"
+            app:defaultValue="aaa"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+    <PreferenceCategory
         app:title="杂项"
         app:iconSpaceReserved="false">
-
         <Preference
             app:key="open_picture_Preference"
             app:title="将当前渲染的图片保存到相册"
@@ -78,15 +103,6 @@
             app:entryValues="@array/samples"
             app:iconSpaceReserved="false"
             app:defaultValue="false"/>
-        <ListPreference
-            app:key="thread_Preference"
-            app:title="多线程渲染"
-            app:dialogTitle="多线程渲染(测试)"
-            app:entries="@array/thread"
-            app:entryValues="@array/thread"
-            app:defaultValue="aaa"
-            app:useSimpleSummaryProvider="true"
-            app:iconSpaceReserved="false" />
     </PreferenceCategory>
     <PreferenceCategory
         app:title="关于"

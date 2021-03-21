@@ -15,21 +15,191 @@
         android:layout_height="match_parent"
         android:layout_gravity="center" />
 
-    <!--中心线-->
-    <View
-        android:id="@+id/axis_horizontal"
-        android:layout_gravity="center_vertical"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@color/back_for_layout"
+        android:id="@+id/generate_info_ConstraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/white"
-        android:visibility="gone"/>
-    <View
-        android:id="@+id/axis_vertical"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="0.5dp"
+        android:layout_height="220dp"
+        android:visibility="gone"
+        android:alpha="0.7"
+        >
+        <LinearLayout
+            android:layout_marginStart="4dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:text="输出"
+                android:textColor="@color/white"
+                />
+            <ScrollView
+                android:id="@+id/generate_info_ScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                >
+                <TextView
+                    android:id="@+id/generate_info_TextView"
+                    android:layout_gravity="left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/white"
+                    />
+            </ScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginEnd="4dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/LinearLayout_generate_process"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+            <!--屏幕宽度 411dp (1920*2340)-->
+            <TextView
+                android:text="线程渲染进度"
+                android:layout_height="20dp"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/white"
+                />
+            <ProgressBar
+                android:id="@+id/process_0"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_1"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_2"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_3"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_4"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_5"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_6"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_7"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_8"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+            <ProgressBar
+                android:id="@+id/process_9"
+                android:layout_width="180dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:max="100"
+                android:progress="0"
+                android:visibility="invisible"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--中心线-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
-        android:visibility="gone"/>
+        android:id="@+id/axis"
+        android:visibility="gone">
+        <View
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/axis_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/white" />
+        <View
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/axis_vertical"
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <com.zjh.fractal.BottomDrawerLayout
         android:id="@+id/bottom_drawer_layout"
@@ -51,7 +221,7 @@
                 android:id="@+id/fractal_ConstraintLayout3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:alpha="0.75"
+                android:alpha="0.7"
                 android:background="@color/back_for_layout">
                 <Button
                     android:id="@+id/fractal_more_btn0"
@@ -270,11 +440,18 @@
                     android:layout_height="60dp"
                     android:onClick="fractal_right_down"
                     android:text="↘"
-
                     android:textSize="20sp"
                     app:layout_constraintStart_toEndOf="@+id/fractal_btn6"
                     app:layout_constraintTop_toTopOf="@+id/fractal_btn6" />
 
+                <ProgressBar
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:visibility="invisible"
+                    android:id="@+id/generating"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_btn7"
+                    app:layout_constraintStart_toStartOf="@+id/fractal_btn5"
+                    />
                 <LinearLayout
                     android:layout_width="88dp"
                     android:layout_height="wrap_content"
@@ -306,7 +483,7 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="2dp"
                         >
                         <TextView
                             android:layout_width="wrap_content"
@@ -328,7 +505,7 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="2dp"
                         >
                         <TextView
                             android:layout_width="wrap_content"
@@ -350,7 +527,7 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="2dp"
                         >
                         <TextView
                             android:layout_width="wrap_content"
@@ -369,6 +546,28 @@
                             android:layout_gravity="end|center_vertical"
                             />
                     </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="渲染信息"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:layout_gravity="start|center_vertical"
+                            />
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/fractal_switch5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:thumbTint="@color/white"
+                            android:layout_gravity="end|center_vertical"
+                            />
+                    </FrameLayout>
                 </LinearLayout>
 
                 <FrameLayout
@@ -376,7 +575,6 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="4dp"
                     android:clickable="true"
                     android:onClick="settings"
                     app:layout_constraintBottom_toBottomOf="parent"
