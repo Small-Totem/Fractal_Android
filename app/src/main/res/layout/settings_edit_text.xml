@@ -138,7 +138,7 @@
             android:id="@+id/preferences_edit6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="[Int][1~65536]"
+            android:hint="[Int][1~2147483647]"
             android:inputType="number"
             />
     </LinearLayout>
@@ -160,7 +160,7 @@
             android:id="@+id/preferences_edit7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="[Int][1~65536]"
+            android:hint="[Int][1~2147483647]"
             android:inputType="number"
             android:imeOptions="actionDone"
             />

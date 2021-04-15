@@ -1,4 +1,6 @@
 package com.zjh.fractal;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,9 +17,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.zjh.fractal.util.ActivityManager;
+import com.zjh.fractal.util.SaveData;
+import com.zjh.fractal.util.Tools;
+
+import java.util.Objects;
+
 import static com.zjh.fractal.Definition.*;
+import static com.zjh.fractal.view.ZLogView.info_status_error;
 
 public class SettingsActivity extends AppCompatActivity {
+    EditText et1;
+    EditText et2;
+    EditText et3;
+    EditText et4;
+    EditText et5;
+    EditText et6;
+    EditText et7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat
@@ -50,8 +68,10 @@ public class SettingsActivity extends AppCompatActivity {
         Preference auto_iteration_Preference;
         Preference transition_Preference;
         Preference generate_info_Preference;
+        Preference exit_Preference;
 
-        boolean first_click = true;
+        boolean flag_if_first_click_for_recovery = true;
+        boolean flag_if_first_click_for_exit = true;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -72,10 +92,11 @@ public class SettingsActivity extends AppCompatActivity {
             thread_Preference = findPreference("thread_Preference");
             auto_iteration_Preference = findPreference("auto_iteration_Preference");
             transition_Preference = findPreference("transition_Preference");
-            generate_info_Preference=findPreference("generate_info_Preference");
+            generate_info_Preference = findPreference("generate_info_Preference");
+            exit_Preference = findPreference("exit_Preference");
 
             night_mode_Preference.setOnPreferenceClickListener(this);
-            color_reverse_Preference.setOnPreferenceClickListener(this);//其实不应该设置成onclick 而应该是onchange 下次一定
+            color_reverse_Preference.setOnPreferenceClickListener(this);// 其实不应该设置成onclick 而应该是onchange 下次一定
             read_data_Preference.setOnPreferenceClickListener(this);
             open_picture_Preference.setOnPreferenceClickListener(this);
             about_fractal_Preference.setOnPreferenceClickListener(this);
@@ -86,7 +107,7 @@ public class SettingsActivity extends AppCompatActivity {
             generate_mode_Preference.setOnPreferenceChangeListener(this);
             samples_Preference.setOnPreferenceChangeListener(this);
             thread_Preference.setOnPreferenceChangeListener(this);
-
+            exit_Preference.setOnPreferenceClickListener(this);
         }
 
         @Override
@@ -107,35 +128,50 @@ public class SettingsActivity extends AppCompatActivity {
             } else if (preference.equals(read_data_Preference)) {
                 // 由于第一次进入程序时会写入值到scale_times_false中，此时scale_times_true为空值，
                 // 所以用scale_times_true来判断是不是第一次进程序
-                if (SaveData.get_data_double(getContext(), "scale_times_true",0) == 0f) {
+                if (SaveData.get_data_double(getContext(), "scale_times_true", 0) == 0f) {
                     preference.setSummary("没有已保存的参数");
                     return false;
                 }
-                if (first_click) {
+                if (flag_if_first_click_for_recovery) {
                     preference.setSummary("再次点击以确认");
-                    first_click = false;
+                    flag_if_first_click_for_recovery = false;
                     return false;
                 }
                 preference.setSummary("正在渲染");
                 get_info_from_SaveData(getContext(), flag_use_data);
                 flag_should_reload = true;
-                getActivity().finish();
+                requireActivity().finish();
             } else if (preference.equals(open_picture_Preference)) {
                 // 轮子:打开图片
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                Bitmap bitmap = Tools.GetLocalBitmap(file_path);
-                String uriString = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), bitmap, null,
-                        null);
-                Uri uri = Uri.parse(uriString);
-                intent.setDataAndType(uri, "image/*");
-                startActivity(intent);
+                Bitmap bitmap = Tools.GetLocalBitmap(file_path,
+                        (MainActivity) ActivityManager.activityLinkedList.get(0));
+                try {
+                    String uriString = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bitmap,
+                            null, null);
+                    Uri uri = Uri.parse(uriString);
+                    intent.setDataAndType(uri, "image/*");
+                    startActivity(intent);
+                } catch (Exception e) {
+                    ((MainActivity) ActivityManager.activityLinkedList.get(0)).generate_info_add(info_status_error,
+                            e.toString());
+                }
             } else if (preference.equals(about_fractal_Preference)) {
                 about_fractal_Preference.setSummary(R.string.about);
                 about_fractal_Preference.setSelectable(false);
-            }else if(preference.equals(transition_Preference)){
-                flag_use_transition_animation=!flag_use_transition_animation;
-            }else if(preference.equals(generate_info_Preference)){
-                flag_monitor_generate_info=!flag_monitor_generate_info;
+            } else if (preference.equals(transition_Preference)) {
+                flag_use_transition_animation = !flag_use_transition_animation;
+            } else if (preference.equals(generate_info_Preference)) {
+                flag_monitor_generate_info = !flag_monitor_generate_info;
+            } else if (preference.equals(exit_Preference)) {
+                if (flag_if_first_click_for_exit) {
+                    preference.setSummary("再次点击以确认");
+                    flag_if_first_click_for_exit = false;
+                    return false;
+                }
+                // requireActivity().finish();
+
+                MainActivity.am.exitApp();
             }
             return false;
         }
@@ -184,7 +220,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 flag_should_reload = true;
                 samples_Preference.setSummary("正在渲染");
-                getActivity().finish();
+                requireActivity().finish();
             } else if (preference.equals(thread_Preference)) {
                 final String[] str = getResources().getStringArray(R.array.thread);
                 for (int i = 0; i < str.length; i++) {
@@ -192,6 +228,8 @@ public class SettingsActivity extends AppCompatActivity {
                         use_thread = i * 2;
                         // i=0(不使用多线程)->use_thread=0
                         // i=1->use_thread=2->2线程
+                        if (use_thread < 1)
+                            use_thread = 1;
                         return true;
                     }
                 }
@@ -203,27 +241,27 @@ public class SettingsActivity extends AppCompatActivity {
     public static void get_info_from_SaveData(Context c, boolean b) {
         if (!b) {// 正在写入的SharedPreferences为A,则应读取的为B
                  // 详见MainActivity中对flag_use_data的注释
-            center_x = SaveData.get_data_double(c, "center_x_true",0);
-            center_y = SaveData.get_data_double(c, "center_y_true",0);
-            scale_times = SaveData.get_data_double(c, "scale_times_true",0.5);
+            center_x = SaveData.get_data_double(c, "center_x_true", 0);
+            center_y = SaveData.get_data_double(c, "center_y_true", 0);
+            scale_times = SaveData.get_data_double(c, "scale_times_true", 0.5);
             pixel_times = 0.1;
-            color_reversal = SaveData.get_data_boolean(c, "color_reversal_true",true);
-            auto_iteration = SaveData.get_data_boolean(c, "iteration_auto_true",false);
-            fractal_id = SaveData.get_data_int(c, "fractal_id_true",0);
-            generate_mode = SaveData.get_data_int(c, "generate_mode_true",0);
-            iteration_times = SaveData.get_data_int(c, "iteration_times_true",128);
-            auto_iteration_max = SaveData.get_data_int(c, "auto_iteration_max_true",2000);
+            color_reversal = SaveData.get_data_boolean(c, "color_reversal_true", true);
+            auto_iteration = SaveData.get_data_boolean(c, "iteration_auto_true", false);
+            fractal_id = SaveData.get_data_int(c, "fractal_id_true", 0);
+            generate_mode = SaveData.get_data_int(c, "generate_mode_true", 0);
+            iteration_times = SaveData.get_data_int(c, "iteration_times_true", 128);
+            auto_iteration_max = SaveData.get_data_int(c, "auto_iteration_max_true", 2000);
         } else {
-            center_x = SaveData.get_data_double(c, "center_x_false",0);
-            center_y = SaveData.get_data_double(c, "center_y_false",0);
-            scale_times = SaveData.get_data_double(c, "scale_times_false",0.5);
+            center_x = SaveData.get_data_double(c, "center_x_false", 0);
+            center_y = SaveData.get_data_double(c, "center_y_false", 0);
+            scale_times = SaveData.get_data_double(c, "scale_times_false", 0.5);
             pixel_times = 0.1;
-            color_reversal = SaveData.get_data_boolean(c, "color_reversal_false",true);
-            auto_iteration = SaveData.get_data_boolean(c, "iteration_auto_false",false);
-            fractal_id = SaveData.get_data_int(c, "fractal_id_false",0);
-            generate_mode = SaveData.get_data_int(c, "generate_mode_false",0);
-            iteration_times = SaveData.get_data_int(c, "iteration_times_false",128);
-            auto_iteration_max = SaveData.get_data_int(c, "auto_iteration_max_false",2000);
+            color_reversal = SaveData.get_data_boolean(c, "color_reversal_false", true);
+            auto_iteration = SaveData.get_data_boolean(c, "iteration_auto_false", false);
+            fractal_id = SaveData.get_data_int(c, "fractal_id_false", 0);
+            generate_mode = SaveData.get_data_int(c, "generate_mode_false", 0);
+            iteration_times = SaveData.get_data_int(c, "iteration_times_false", 128);
+            auto_iteration_max = SaveData.get_data_int(c, "auto_iteration_max_false", 2000);
         }
     }
 
@@ -458,21 +496,16 @@ public class SettingsActivity extends AppCompatActivity {
         default:
             break;
         }
+        auto_iteration = true;
+        auto_iteration_max = 2000;
     }
 
     //////////////////////////////////
     /// onclick函数
     public void settings_confirm(View v) {
+        find_view();
         boolean flag_return = false;
         flag_should_reload = true;
-        EditText et1 = findViewById(R.id.preferences_edit1);
-        EditText et2 = findViewById(R.id.preferences_edit2);
-        EditText et3 = findViewById(R.id.preferences_edit3);
-        EditText et4 = findViewById(R.id.preferences_edit4);
-        EditText et5 = findViewById(R.id.preferences_edit5);
-        EditText et6 = findViewById(R.id.preferences_edit6);
-        EditText et7 = findViewById(R.id.preferences_edit7);
-
         // if(!"java.lang.NumberFormatException: empty String".equals(e.toString()))
         // 显然这里的try,catch不应该这么搞，但是不知道标准的用法是怎样的，暂时将就下
 
@@ -546,7 +579,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         try {
             int i = Integer.parseInt(et6.getText().toString());
-            if (i <= 0 || i > iteration_max) {
+            if (i <= 0) {
                 et6.setTextColor(getColor(R.color.red));
                 flag_return = true;
             } else {
@@ -554,6 +587,8 @@ public class SettingsActivity extends AppCompatActivity {
                 et6.setTextColor(getResources().getColor(R.color.text_color));
             }
         } catch (NumberFormatException e) {
+            // 离谱，这里似乎是因为这里是android:inputType="number"而非android:inputType="numberDecimal"
+            // 所以错误类型不一样
             if (!"java.lang.NumberFormatException: For input string: \"\"".equals(e.toString())) {
                 et6.setTextColor(getColor(R.color.red));
                 flag_return = true;
@@ -562,7 +597,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         try {
             int i = Integer.parseInt(et7.getText().toString());
-            if (i <= 0 || i > iteration_max) {
+            if (i <= 0) {
                 et7.setTextColor(getColor(R.color.red));
                 flag_return = true;
             } else {
@@ -583,15 +618,9 @@ public class SettingsActivity extends AppCompatActivity {
         finish();
     }
 
+    @SuppressLint("SetTextI18n")
     public void settings_load(View v) {
-        EditText et1 = findViewById(R.id.preferences_edit1);
-        EditText et2 = findViewById(R.id.preferences_edit2);
-        EditText et3 = findViewById(R.id.preferences_edit3);
-        EditText et4 = findViewById(R.id.preferences_edit4);
-        EditText et5 = findViewById(R.id.preferences_edit5);
-        EditText et6 = findViewById(R.id.preferences_edit6);
-        EditText et7 = findViewById(R.id.preferences_edit7);
-
+        find_view();
         et1.setText(Double.toString(center_x));
         et2.setText(Double.toString(center_y));
         et3.setText(Double.toString(scale_times));
@@ -602,14 +631,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void settings_clear(View v) {
-        EditText et1 = findViewById(R.id.preferences_edit1);
-        EditText et2 = findViewById(R.id.preferences_edit2);
-        EditText et3 = findViewById(R.id.preferences_edit3);
-        EditText et4 = findViewById(R.id.preferences_edit4);
-        EditText et5 = findViewById(R.id.preferences_edit5);
-        EditText et6 = findViewById(R.id.preferences_edit6);
-        EditText et7 = findViewById(R.id.preferences_edit7);
-
+        find_view();
         et1.setText("");
         et2.setText("");
         et3.setText("");
@@ -617,5 +639,17 @@ public class SettingsActivity extends AppCompatActivity {
         et5.setText("");
         et6.setText("");
         et7.setText("");
+    }
+
+    private void find_view() {
+        // 由于这里的控件都是嵌在preferences里面的，如果在oncreate用实例化会出错
+        // 似乎是因为oncreate的时候这些控件还没创建好？
+        et1 = findViewById(R.id.preferences_edit1);
+        et2 = findViewById(R.id.preferences_edit2);
+        et3 = findViewById(R.id.preferences_edit3);
+        et4 = findViewById(R.id.preferences_edit4);
+        et5 = findViewById(R.id.preferences_edit5);
+        et6 = findViewById(R.id.preferences_edit6);
+        et7 = findViewById(R.id.preferences_edit7);
     }
 }

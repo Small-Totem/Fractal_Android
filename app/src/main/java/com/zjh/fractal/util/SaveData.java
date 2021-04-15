@@ -1,4 +1,4 @@
-package com.zjh.fractal;
+package com.zjh.fractal.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -11,7 +11,7 @@ public class SaveData {
         return edit.putLong(key, Double.doubleToRawLongBits(value));
     }
     static double getDouble(final SharedPreferences prefs, final String key, final double default_value) {
-        if ( !prefs.contains(key))
+        if (!prefs.contains(key))
             return default_value;
         return Double.longBitsToDouble(prefs.getLong(key, 0));
     }

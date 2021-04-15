@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="red">#FF5151</color>
+    <color name="light_red">#FF5E5E</color>
+    <color name="red">#FF0C0C</color>
     <color name="light_blue">#0F81DA</color>
     <color name="dark_blue">#085794</color>
     <color name="black">#000000</color>
@@ -11,4 +12,7 @@
     <color name="nothing">#00FFFFFF</color>
     <color name="back_for_layout">#33000000</color>
     <color name="white_for_ripple">#A3A3A3</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="grey">#7E7E7E</color>
+    <color name="green">#23FF2C</color>
 </resources>

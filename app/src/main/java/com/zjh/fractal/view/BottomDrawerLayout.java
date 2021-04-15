@@ -1,4 +1,4 @@
-package com.zjh.fractal;
+package com.zjh.fractal.view;
 import android.content.Context;
 //import android.support.v4.view.ViewCompat;
 //import android.support.v4.widget.ViewDragHelper;
@@ -10,6 +10,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+
+import com.zjh.fractal.R;
 
 //轮子：BottomDrawerLayout 来自github
 
@@ -79,7 +81,7 @@ public class BottomDrawerLayout extends ViewGroup {
         //从底部到顶部的顺序遍历子view
         @Override
         public int getOrderedChildIndex(int index) {
-            int childCount = com.zjh.fractal.BottomDrawerLayout.this.getChildCount();
+            int childCount = BottomDrawerLayout.this.getChildCount();
             int newIndex = childCount - index -1;
 
             return  newIndex;

@@ -1,13 +1,17 @@
-package com.zjh.fractal;
+package com.zjh.fractal.util;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Environment;
+import com.zjh.fractal.Definition;
+import com.zjh.fractal.MainActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+
+import static com.zjh.fractal.view.ZLogView.info_status_error;
 
 public class Tools {
     public static Bitmap Negative(Bitmap bm){
@@ -72,13 +76,13 @@ public class Tools {
         return context.getFilesDir().getAbsolutePath();
     }
 
-    public static Bitmap GetLocalBitmap(String url) {
+    public static Bitmap GetLocalBitmap(String url, MainActivity m) {
         try {
             FileInputStream fis = new FileInputStream(url);
             return BitmapFactory.decodeStream(fis); /// 把流转化为Bitmap图片
-
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            m.generate_info_add(info_status_error, "文件读取错误\n"+e.toString());
             return null;
         }
     }

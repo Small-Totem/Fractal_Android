@@ -15,19 +15,24 @@
         android:layout_height="match_parent"
         android:layout_gravity="center" />
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@color/back_for_layout"
-        android:id="@+id/generate_info_ConstraintLayout"
+        android:id="@+id/generate_info"
         android:layout_width="match_parent"
         android:layout_height="220dp"
         android:visibility="gone"
         android:alpha="0.7"
         >
         <LinearLayout
-            android:layout_marginStart="4dp"
+            android:id="@+id/generate_info_LinearLayout_output"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_width="180dp"
+            app:layout_constraintEnd_toStartOf="@+id/generate_info_LinearLayout_progress"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             >
@@ -43,23 +48,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 >
-                <TextView
-                    android:id="@+id/generate_info_TextView"
-                    android:layout_gravity="left"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/generate_info_LinearLayout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/white"
-                    />
+                    android:orientation="vertical"
+                    >
+                </LinearLayout>
             </ScrollView>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_marginEnd="4dp"
+            android:id="@+id/generate_info_LinearLayout_progress"
+            android:layout_marginEnd="2dp"
+            android:layout_marginStart="2dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/LinearLayout_generate_process"
-            android:layout_width="wrap_content"
+            app:layout_constraintStart_toEndOf="@+id/generate_info_LinearLayout_output"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
             >
@@ -72,8 +79,8 @@
                 android:textColor="@color/white"
                 />
             <ProgressBar
-                android:id="@+id/process_0"
-                android:layout_width="180dp"
+                android:id="@+id/progress_0"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -82,8 +89,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_1"
-                android:layout_width="180dp"
+                android:id="@+id/progress_1"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -92,8 +99,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_2"
-                android:layout_width="180dp"
+                android:id="@+id/progress_2"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -102,8 +109,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_3"
-                android:layout_width="180dp"
+                android:id="@+id/progress_3"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -112,8 +119,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_4"
-                android:layout_width="180dp"
+                android:id="@+id/progress_4"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -122,8 +129,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_5"
-                android:layout_width="180dp"
+                android:id="@+id/progress_5"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -132,8 +139,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_6"
-                android:layout_width="180dp"
+                android:id="@+id/progress_6"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -142,8 +149,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_7"
-                android:layout_width="180dp"
+                android:id="@+id/progress_7"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -152,8 +159,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_8"
-                android:layout_width="180dp"
+                android:id="@+id/progress_8"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -162,8 +169,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
             <ProgressBar
-                android:id="@+id/process_9"
-                android:layout_width="180dp"
+                android:id="@+id/progress_9"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_gravity="center_horizontal"
                 android:max="100"
@@ -201,7 +208,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <com.zjh.fractal.BottomDrawerLayout
+    <com.zjh.fractal.view.BottomDrawerLayout
         android:id="@+id/bottom_drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -223,92 +230,129 @@
                 android:layout_height="wrap_content"
                 android:alpha="0.7"
                 android:background="@color/back_for_layout">
-                <Button
-                    android:id="@+id/fractal_more_btn0"
-                    android:text="自适应迭代"
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_0"
+                    android:text="放大x1.5"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_1"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="fractal_1_5x"
+                    />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_1"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_0"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_0"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_2"
+                    android:text="2x渲染"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="generate_fractal_2x"
+                    />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_2"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_0"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_1"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_3"
+                    android:text="渲染模式+1"
+                    android:onClick="change_generate_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_3"
+                    android:text="自适应迭代"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_0"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_2"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="iteration_auto"
                     />
-                <Button
-                    android:id="@+id/fractal_more_btn1"
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_4"
                     android:text="横向x2"
-                    app:layout_constraintTop_toBottomOf="@+id/fractal_more_btn0"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_more_btn_0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn2"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="double_horizontal"
                     android:enabled="false"/>
-                <Button
-                    android:id="@+id/fractal_more_btn2"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_5"
                     android:text="纵向x2"
-                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn1"
-                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn1"
-                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn3"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_4"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_4"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="double_vertical"
                     android:enabled="false"/>
-                <Button
-                    android:id="@+id/fractal_more_btn3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="渲染模式+1"
-                    android:onClick="change_generate_mode"
-                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn1"
-                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn2"
-                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn4" />
-                <Button
-                    android:id="@+id/fractal_more_btn4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="渲染反转"
-                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn1"
-                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn3"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:onClick="reverse"/>
-                <Button
-                    android:id="@+id/fractal_more_btn5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="迭代x2"
-                    app:layout_constraintTop_toBottomOf="@+id/fractal_more_btn1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn6"
-                    android:onClick="iteration_times_double"/>
-                <Button
-                    android:id="@+id/fractal_more_btn6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="迭代/2"
-                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn5"
-                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn5"
-                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn7"
-                    android:onClick="iteration_times_half"/>
-                <Button
-                    android:id="@+id/fractal_more_btn7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="迭代+1"
-                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn5"
-                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn6"
-                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn8"
-                    android:onClick="iteration_times_plus_one"/>
                 <!-- android:textStyle="italic"即斜体，用来表示这个按钮不会改变图片文件本身-->
-                <Button
-                    android:id="@+id/fractal_more_btn8"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="italic"
                     android:text="显示反转"
-                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn5"
-                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn7"
+                    android:onClick="display_color_reverse"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_4"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_5"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_7" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="渲染反转"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_4"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_6"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:onClick="display_color_reverse"/>
+                    android:onClick="reverse"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="迭代x2"
+                    app:layout_constraintTop_toBottomOf="@+id/fractal_more_btn_4"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_9"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    android:onClick="iteration_times_double"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="迭代/2"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_8"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_8"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_10"
+                    android:onClick="iteration_times_half"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="迭代+1"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_8"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_9"
+                    app:layout_constraintEnd_toStartOf="@+id/fractal_more_btn_11"
+                    android:onClick="iteration_times_plus_one"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fractal_more_btn_11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="迭代-1"
+                    android:onClick="iteration_times_minus_one"
+                    app:layout_constraintTop_toTopOf="@+id/fractal_more_btn_8"
+                    app:layout_constraintStart_toEndOf="@+id/fractal_more_btn_10"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -318,8 +362,7 @@
                 android:background="@color/back_for_layout"
                 android:alpha="0.7"
                 >
-                <Button
-
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -328,7 +371,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -338,7 +381,7 @@
                     app:layout_constraintStart_toStartOf="@+id/fractal_btn1"
                     app:layout_constraintTop_toBottomOf="@+id/fractal_btn1" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -348,7 +391,7 @@
                     app:layout_constraintStart_toStartOf="@+id/fractal_btn2"
                     app:layout_constraintTop_toBottomOf="@+id/fractal_btn2" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -358,7 +401,7 @@
                     app:layout_constraintStart_toStartOf="@+id/fractal_btn3"
                     app:layout_constraintTop_toBottomOf="@+id/fractal_btn3" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn5"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
@@ -370,7 +413,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn6"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
@@ -380,7 +423,7 @@
                     app:layout_constraintStart_toStartOf="@+id/fractal_btn5"
                     app:layout_constraintTop_toBottomOf="@+id/fractal_btn7" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn7"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
@@ -390,7 +433,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/fractal_btn5"
                     app:layout_constraintTop_toBottomOf="@+id/fractal_btn5" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn8"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
@@ -401,7 +444,7 @@
                     app:layout_constraintStart_toEndOf="@+id/fractal_btn5"
                     app:layout_constraintTop_toBottomOf="@+id/fractal_btn5" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn9"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
@@ -412,7 +455,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/fractal_btn5"
                     app:layout_constraintTop_toTopOf="@+id/fractal_btn5" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn10"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
@@ -423,7 +466,7 @@
                     app:layout_constraintStart_toEndOf="@+id/fractal_btn5"
                     app:layout_constraintTop_toTopOf="@+id/fractal_btn5" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn11"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
@@ -434,7 +477,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/fractal_btn6"
                     app:layout_constraintTop_toTopOf="@+id/fractal_btn6" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fractal_btn12"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
@@ -586,7 +629,7 @@
                         android:layout_height="24dp"
                         android:layout_gravity="center"
                         android:scaleType="centerInside"
-                        android:src="@drawable/settings"
+                        app:srcCompat="@drawable/settings"
                         app:tint="@color/white"
                         android:background="@drawable/ripple"/>
                 </FrameLayout>
@@ -719,13 +762,13 @@
                     android:layout_gravity="center"
 
                     android:scaleType="centerInside"
-                    android:src="@drawable/up"
+                    app:srcCompat="@drawable/up"
                     app:tint="@color/white"
 
                     />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </com.zjh.fractal.BottomDrawerLayout>
+    </com.zjh.fractal.view.BottomDrawerLayout>
 
 </FrameLayout>

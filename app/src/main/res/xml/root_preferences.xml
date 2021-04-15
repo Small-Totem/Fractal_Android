@@ -136,5 +136,9 @@
             <intent android:action="android.intent.action.VIEW"
                 android:data="https://github.com/Small-Totem/Fractal_Android" />
         </Preference>
+        <Preference app:title="退出"
+            app:key="exit_Preference"
+            app:iconSpaceReserved="false">
+        </Preference>
     </PreferenceCategory>
 </PreferenceScreen>
