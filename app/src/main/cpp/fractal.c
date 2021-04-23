@@ -1,3 +1,6 @@
+//"svpng.inc"来自github:
+//https://github.com/miloyip/svpng
+
 #include <stdint.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -12,7 +15,7 @@
 
 #define LOG_TAG "fractal.c_log"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define GENERATE_INFO_ADD(mode,text) (*env)->CallVoidMethod(env, gs_object, method_generate_info_add, mode, char_to_jstring(env, text));
+#define GENERATE_INFO_ADD(mode,text) (*env)->CallVoidMethod(env, gs_object, method_generate_info_add, mode, char_to_jstring(env, text))
 
 static int static_id = 0;
 static int static_color_reversal = 0;

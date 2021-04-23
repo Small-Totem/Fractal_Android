@@ -1,10 +1,11 @@
 package com.zjh.fractal;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -137,13 +138,6 @@ public class MainActivity extends AppCompatActivity {
     public void initial_view() {
         SwitchCompat switch1 = findViewById(R.id.fractal_switch1);
         switch1.setOnCheckedChangeListener((buttonView, isChecked) -> flag_if_generate_now = isChecked);
-        /*
-         * 上面是lambda表达式，这是替换之前的 switch1.setOnCheckedChangeListener(new
-         * CompoundButton.OnCheckedChangeListener() {
-         *
-         * @Override public void onCheckedChanged(CompoundButton buttonView, boolean
-         * isChecked) { flag_if_generate_now=isChecked; } });
-         */
         SwitchCompat switch2 = findViewById(R.id.fractal_switch2);
         switch2.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ConstraintLayout C2 = findViewById(R.id.fractal_ConstraintLayout2);
@@ -158,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
                  * AnimationForView.alpha_animation(C2,400,1f,0.15f,0.15f);
                  */
             } else {
-
                 C2.setAlpha(0.7f);
                 C3.setAlpha(0.7f);
                 /*
@@ -214,8 +207,8 @@ public class MainActivity extends AppCompatActivity {
         generate_color_reverse_button = findViewById(R.id.fractal_more_btn_7);
         display_color_reverse_button = findViewById(R.id.fractal_more_btn_6);
         auto_iteration_button = findViewById(R.id.fractal_more_btn_3);
-        fractal_1_5x_button=findViewById(R.id.fractal_more_btn_0);
-        iteration_minus_1_button=findViewById(R.id.fractal_more_btn_11);
+        fractal_1_5x_button = findViewById(R.id.fractal_more_btn_0);
+        iteration_minus_1_button = findViewById(R.id.fractal_more_btn_11);
 
         progress_bar = findViewById(R.id.generating);
 
@@ -232,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         generate_info_ProgressBar[9] = findViewById(R.id.progress_9);
 
         ScrollView sv = findViewById(R.id.generate_info_ScrollView);
-        log_view=new ZLogView(this,generate_info_LinearLayout,sv);
+        log_view = new ZLogView(this, generate_info_LinearLayout, sv);
     }
 
     @Override
@@ -243,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 处理旋转屏幕时的事件
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         recreate();
     }
@@ -283,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
         flag_is_generating = true;
         pixel_times = quality;
 
-        log_view.clear_screen();
+        log_view.clear();
 
         if (!flag_monitor_generate_info)
             log_view.info_add(info_status_hint, "渲染信息监视已关闭");
@@ -298,65 +291,51 @@ public class MainActivity extends AppCompatActivity {
             init_progress_threads();
 
         final MainActivity m = this;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                show_generating_icon();
-                long time = System.currentTimeMillis();
+        new Thread(() -> {
+            show_generating_icon();
+            long time = System.currentTimeMillis();
 
-                log_view.info_add(getResources().getColor(R.color.grey),"图像分辨率:" + (int) (screenHeight * pixel_times) + "x" + (int) (screenWidth * pixel_times));
+            log_view.info_add(ContextCompat.getColor(this, R.color.grey),
+                    "图像分辨率:" + (int) (screenHeight * pixel_times) + "x" + (int) (screenWidth * pixel_times));
 
-                GenerateFractal((int) (screenHeight * pixel_times), (int) (screenWidth * pixel_times), center_x,
-                        center_y, scale_times * pixel_times, fractal_id, boolean_to_int(color_reversal), generate_mode,
-                        iteration_times, use_thread, get_iteration_auto_max(),
-                        boolean_to_int(flag_monitor_generate_info));
+            GenerateFractal((int) (screenHeight * pixel_times), (int) (screenWidth * pixel_times), center_x, center_y,
+                    scale_times * pixel_times, fractal_id, boolean_to_int(color_reversal), generate_mode,
+                    iteration_times, use_thread, get_iteration_auto_max(), boolean_to_int(flag_monitor_generate_info));
 
-                time = System.currentTimeMillis() - time;
-                double time_d = time / 1000.0;
-                double storage = 3 * screenHeight * screenWidth * pixel_times * pixel_times / 1048576f;// 1024*1024
-                NumberFormat nf = NumberFormat.getNumberInstance();
-                nf.setMaximumFractionDigits(2);
-                nf.setRoundingMode(RoundingMode.UP);
-                log_view.info_add(getResources().getColor(R.color.grey),"共花费" + nf.format(time_d) + "秒,占用" + nf.format(storage) + "MB");
+            time = System.currentTimeMillis() - time;
+            double time_d = time / 1000.0;
+            double storage = 3 * screenHeight * screenWidth * pixel_times * pixel_times / 1048576f;// 1024*1024
+            NumberFormat nf = NumberFormat.getNumberInstance();
+            nf.setMaximumFractionDigits(2);
+            nf.setRoundingMode(RoundingMode.UP);
+            log_view.info_add(ContextCompat.getColor(this, R.color.grey),
+                    "共花费" + nf.format(time_d) + "秒,占用" + nf.format(storage) + "MB");
 
-                runOnUiThread(new Runnable() {
-                    // 在thread里面更新view就要这样写
-                    @Override
-                    public void run() {
-                        Bitmap bitmap = Tools.GetLocalBitmap(file_path, m);
-                        if (use_transition_animation) {
-                            AnimationForView.transition_animation(fractal, getApplicationContext(), bitmap,
-                                    image_change_time);
-                        } else {
-                            fractal.setImageBitmap(bitmap);
-                        }
-                        flag_is_generating = false;
-                    }
-                });
-            }
+            // 在thread里面更新view就要这样写
+            runOnUiThread(() -> {
+                Bitmap bitmap = Tools.GetLocalBitmap(file_path, m);
+                if (use_transition_animation) {
+                    AnimationForView.transition_animation(fractal, getApplicationContext(), bitmap, image_change_time);
+                } else {
+                    fractal.setImageBitmap(bitmap);
+                }
+                flag_is_generating = false;
+            });
         }).start();
     }
 
     public void show_generating_icon() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (flag_is_generating) {
-                    if (progress_bar.getVisibility() == View.INVISIBLE) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progress_bar.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    }
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ignored) {
-                    }
+        new Thread(() -> {
+            while (flag_is_generating) {
+                if (progress_bar.getVisibility() == View.INVISIBLE) {
+                    runOnUiThread(() -> progress_bar.setVisibility(View.VISIBLE));
                 }
-                AnimationForView.close_view(progress_bar, 200, 1f, View.INVISIBLE);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignored) {
+                }
             }
+            AnimationForView.close_view(progress_bar, 200, 1f, View.INVISIBLE);
         }).start();
     }
 
@@ -367,27 +346,19 @@ public class MainActivity extends AppCompatActivity {
         // 对每个线程渲染情况的监听
         for (int i = 0; i < use_thread; i++) {
             int temp_thread_id = i;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    ProgressBar p = generate_info_ProgressBar[temp_thread_id];
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            p.setVisibility(View.VISIBLE);
-                        }
-                    });
-                    generate_progress_thread[temp_thread_id] = 0;
-                    while (generate_progress_thread[temp_thread_id] < 1) {
-                        try {
-                            p.setProgress((int) (generate_progress_thread[temp_thread_id] * 100));
-                            Thread.sleep(generate_progress_wait_time);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
+            new Thread(() -> {
+                ProgressBar p = generate_info_ProgressBar[temp_thread_id];
+                runOnUiThread(() -> p.setVisibility(View.VISIBLE));
+                generate_progress_thread[temp_thread_id] = 0;
+                while (generate_progress_thread[temp_thread_id] < 1) {
+                    try {
+                        p.setProgress((int) (generate_progress_thread[temp_thread_id] * 100));
+                        Thread.sleep(generate_progress_wait_time);
+                    } catch (InterruptedException e) {
+                        break;
                     }
-                    AnimationForView.close_view(p, 150, 1, View.INVISIBLE);
                 }
+                AnimationForView.close_view(p, 150, 1, View.INVISIBLE);
             }).start();
         }
     }
@@ -398,40 +369,33 @@ public class MainActivity extends AppCompatActivity {
 
     public native void init(String path);
 
-    /* jni回调函数,也可由java调用*/
+    /* jni回调函数,也可由java调用 */
     public void generate_info_add(short mode, String text) {
-
-        if(mode==4){
-            log_view.info_add(getResources().getColor(R.color.grey),text);
-        }
-        else if(mode==5){
-            log_view.info_add(Color.GREEN,text);
-        }
-        else{
-            log_view.info_add(mode,text);
-        }
+        if (mode == 4)
+            log_view.info_add(ContextCompat.getColor(this, R.color.grey), text);
+        else if (mode == 5)
+            log_view.info_add(Color.GREEN, text);
+        else
+            log_view.info_add(mode, text);
     }
 
     /* jni回调函数 */
     public void get_progress_from_native(double[] a, int num) {
-        if (generate_progress_thread.length != num) {
+        if (generate_progress_thread.length != num)
             generate_progress_thread = new double[num];
-        }
         generate_progress_thread = a;
     }
 
     private int boolean_to_int(boolean b) {
         if (b)
             return 1;
-        else
-            return 0;
+        return 0;
     }
 
     private int get_iteration_auto_max() {
         if (auto_iteration)
             return auto_iteration_max;
-        else
-            return 0;
+        return 0;
     }
 
     public void update_info() {
@@ -470,14 +434,14 @@ public class MainActivity extends AppCompatActivity {
         iteration_minus_1_button.setEnabled(iteration_times > 1);
 
         if (color_reversal)
-            generate_color_reverse_button.setTextColor(getResources().getColor(R.color.light_blue));
+            generate_color_reverse_button.setTextColor(ContextCompat.getColor(this, R.color.light_blue));
         else
-            generate_color_reverse_button.setTextColor(getResources().getColor(R.color.text_color));
+            generate_color_reverse_button.setTextColor(ContextCompat.getColor(this, R.color.text_color));
         if (auto_iteration)
-            auto_iteration_button.setTextColor(getResources().getColor(R.color.light_blue));
+            auto_iteration_button.setTextColor(ContextCompat.getColor(this, R.color.light_blue));
         else
-            auto_iteration_button.setTextColor(getResources().getColor(R.color.text_color));
-        display_color_reverse_button.setTextColor(getResources().getColor(R.color.text_color));
+            auto_iteration_button.setTextColor(ContextCompat.getColor(this, R.color.text_color));
+        display_color_reverse_button.setTextColor(ContextCompat.getColor(this, R.color.text_color));
 
         getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
                 .putBoolean("color_reverse_Preference", color_reversal).apply();
@@ -627,7 +591,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void iteration_times_half(View v) {
         iteration_times /= 2;
-        if(iteration_times<=0)iteration_times=1;
+        if (iteration_times <= 0)
+            iteration_times = 1;
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
@@ -640,7 +605,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void iteration_times_minus_one(View v) {
         iteration_times--;
-        if(iteration_times<=0)iteration_times=1;
+        if (iteration_times <= 0)
+            iteration_times = 1;
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
@@ -648,9 +614,9 @@ public class MainActivity extends AppCompatActivity {
     public void display_color_reverse(View v) {
         // 显示反转 而非渲染反转
         if (display_color_reversal)
-            ((AppCompatButton) v).setTextColor(getResources().getColor(R.color.text_color));
+            ((AppCompatButton) v).setTextColor(ContextCompat.getColor(this, R.color.text_color));
         else
-            ((AppCompatButton) v).setTextColor(getResources().getColor(R.color.light_blue));
+            ((AppCompatButton) v).setTextColor(ContextCompat.getColor(this, R.color.light_blue));
 
         Bitmap bitmap = Tools.GetLocalBitmap(file_path, this);
 

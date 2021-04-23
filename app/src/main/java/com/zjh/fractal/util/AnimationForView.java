@@ -11,15 +11,15 @@ import android.widget.ImageView;
 
 public class AnimationForView {
 
-    public static void load_view(final View v,int time,float alpha){
-        AlphaAnimation aa = new AlphaAnimation(0f,alpha);
+    public static void load_view(final View v,int time,float end_alpha){
+        AlphaAnimation aa = new AlphaAnimation(0f,end_alpha);
         aa.setDuration(time);//动画持续时间
         v.setVisibility(View.VISIBLE);
         v.startAnimation(aa);
     }
 
-    public static void close_view(final View v,int time,float alpha,int visibility){
-        AlphaAnimation aa = new AlphaAnimation(alpha,0f);
+    public static void close_view(final View v,int time,float start_alpha,int visibility){
+        AlphaAnimation aa = new AlphaAnimation(start_alpha,0f);
         aa.setDuration(time);
         v.startAnimation(aa);
         aa.setAnimationListener(new Animation.AnimationListener() {
@@ -30,7 +30,7 @@ public class AnimationForView {
             public void onAnimationStart(Animation animation) {}
         });
     }
-
+/*
     public static void alpha_animation(final View v,int time,float alpha1,float alpha2,float end_alpha){
         AlphaAnimation aa = new AlphaAnimation(alpha1,alpha2);
         aa.setDuration(time);
@@ -48,7 +48,7 @@ public class AnimationForView {
             }
         });
         //aa.setFillAfter(true);
-    }
+    }*/
 
     public static void transition_animation(ImageView image_view, Context context, Bitmap bitmap, int image_change_time){
         if(bitmap==null)return;

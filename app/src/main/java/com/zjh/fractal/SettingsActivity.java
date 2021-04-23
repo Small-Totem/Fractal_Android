@@ -15,14 +15,13 @@ import android.widget.EditText;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.zjh.fractal.util.ActivityManager;
 import com.zjh.fractal.util.SaveData;
 import com.zjh.fractal.util.Tools;
-
-import java.util.Objects;
 
 import static com.zjh.fractal.Definition.*;
 import static com.zjh.fractal.view.ZLogView.info_status_error;
@@ -35,6 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
     EditText et5;
     EditText et6;
     EditText et7;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +46,7 @@ public class SettingsActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.settings, new SettingsFragment()).commit();
         }
 
+        context = getApplicationContext();
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -147,8 +148,8 @@ public class SettingsActivity extends AppCompatActivity {
                 Bitmap bitmap = Tools.GetLocalBitmap(file_path,
                         (MainActivity) ActivityManager.activityLinkedList.get(0));
                 try {
-                    String uriString = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bitmap,
-                            null, null);
+                    String uriString = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(),
+                            bitmap, Long.toString(System.currentTimeMillis()), null);
                     Uri uri = Uri.parse(uriString);
                     intent.setDataAndType(uri, "image/*");
                     startActivity(intent);
@@ -511,52 +512,52 @@ public class SettingsActivity extends AppCompatActivity {
 
         try {
             center_x = Double.parseDouble(et1.getText().toString());
-            et1.setTextColor(getResources().getColor(R.color.text_color));
+            et1.setTextColor(ContextCompat.getColor(context,R.color.text_color));
         } catch (NumberFormatException e) {
             if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
                 flag_return = true;
-                et1.setTextColor(getColor(R.color.red));
+                et1.setTextColor(ContextCompat.getColor(this,R.color.red));
             }
         }
 
         try {
             center_y = Double.parseDouble(et2.getText().toString());
-            et2.setTextColor(getResources().getColor(R.color.text_color));
+            et2.setTextColor(ContextCompat.getColor(context,R.color.text_color));
         } catch (NumberFormatException e) {
             if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
                 flag_return = true;
-                et2.setTextColor(getColor(R.color.red));
+                et2.setTextColor(ContextCompat.getColor(this,R.color.red));
             }
         }
 
         try {
             double d = Double.parseDouble(et3.getText().toString());
             if (d == 0 || d > scale_max) {
-                et3.setTextColor(getColor(R.color.red));
+                et3.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             } else {
                 scale_times = d;
-                et3.setTextColor(getResources().getColor(R.color.text_color));
+                et3.setTextColor(ContextCompat.getColor(context,R.color.text_color));
             }
         } catch (NumberFormatException e) {
             if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
                 flag_return = true;
-                et3.setTextColor(getColor(R.color.red));
+                et3.setTextColor(ContextCompat.getColor(this,R.color.red));
             }
         }
 
         try {
             double d = Double.parseDouble(et4.getText().toString());
             if (d > 3 || d < 0.1) {
-                et4.setTextColor(getColor(R.color.red));
+                et4.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             } else {
                 pixel_times = d;
-                et4.setTextColor(getResources().getColor(R.color.text_color));
+                et4.setTextColor(ContextCompat.getColor(context,R.color.text_color));
             }
         } catch (NumberFormatException e) {
             if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
-                et4.setTextColor(getColor(R.color.red));
+                et4.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             }
         }
@@ -564,15 +565,15 @@ public class SettingsActivity extends AppCompatActivity {
         try {
             double d = Double.parseDouble(et5.getText().toString());
             if (d > 1 || d < 0.1) {
-                et5.setTextColor(getColor(R.color.red));
+                et5.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             } else {
                 generate_now_quality = d;
-                et5.setTextColor(getResources().getColor(R.color.text_color));
+                et5.setTextColor(ContextCompat.getColor(context,R.color.text_color));
             }
         } catch (NumberFormatException e) {
             if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
-                et5.setTextColor(getColor(R.color.red));
+                et5.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             }
         }
@@ -580,17 +581,17 @@ public class SettingsActivity extends AppCompatActivity {
         try {
             int i = Integer.parseInt(et6.getText().toString());
             if (i <= 0) {
-                et6.setTextColor(getColor(R.color.red));
+                et6.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             } else {
                 iteration_times = i;
-                et6.setTextColor(getResources().getColor(R.color.text_color));
+                et6.setTextColor(ContextCompat.getColor(context,R.color.text_color));
             }
         } catch (NumberFormatException e) {
             // 离谱，这里似乎是因为这里是android:inputType="number"而非android:inputType="numberDecimal"
             // 所以错误类型不一样
             if (!"java.lang.NumberFormatException: For input string: \"\"".equals(e.toString())) {
-                et6.setTextColor(getColor(R.color.red));
+                et6.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             }
         }
@@ -598,15 +599,15 @@ public class SettingsActivity extends AppCompatActivity {
         try {
             int i = Integer.parseInt(et7.getText().toString());
             if (i <= 0) {
-                et7.setTextColor(getColor(R.color.red));
+                et7.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             } else {
                 auto_iteration_max = i;
-                et7.setTextColor(getResources().getColor(R.color.text_color));
+                et7.setTextColor(ContextCompat.getColor(context,R.color.text_color));
             }
         } catch (NumberFormatException e) {
             if (!"java.lang.NumberFormatException: For input string: \"\"".equals(e.toString())) {
-                et7.setTextColor(getColor(R.color.red));
+                et7.setTextColor(ContextCompat.getColor(this,R.color.red));
                 flag_return = true;
             }
         }

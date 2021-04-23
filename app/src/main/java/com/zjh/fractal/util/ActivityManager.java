@@ -59,14 +59,11 @@ public class ActivityManager extends Application {
             activity.finish();
         }
         // 等待0.5s,结束进程
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(500);
-                    System.exit(0);
-                } catch (InterruptedException ignored) {
-                }
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+                System.exit(0);
+            } catch (InterruptedException ignored) {
             }
         }).start();
     }

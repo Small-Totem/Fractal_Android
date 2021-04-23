@@ -4,12 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Environment;
-import com.zjh.fractal.Definition;
 import com.zjh.fractal.MainActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 import static com.zjh.fractal.view.ZLogView.info_status_error;
 

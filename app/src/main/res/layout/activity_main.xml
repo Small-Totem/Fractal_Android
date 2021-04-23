@@ -211,8 +211,7 @@
     <com.zjh.fractal.view.BottomDrawerLayout
         android:id="@+id/bottom_drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_height="wrap_content">
 
 
         <!--弹出-->
@@ -768,7 +767,5 @@
                     />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </com.zjh.fractal.view.BottomDrawerLayout>
-
 </FrameLayout>

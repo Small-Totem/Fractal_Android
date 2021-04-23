@@ -4,12 +4,13 @@ import android.content.SharedPreferences;
 
 public class SaveData {
     public static SharedPreferences share(Context context){
-        SharedPreferences sharedPreferences = context.getSharedPreferences("info", Context.MODE_PRIVATE);
-        return sharedPreferences;
+        return context.getSharedPreferences("info", Context.MODE_PRIVATE);
     }
+
     static SharedPreferences.Editor putDouble(final SharedPreferences.Editor edit, final String key, final double value) {
         return edit.putLong(key, Double.doubleToRawLongBits(value));
     }
+
     static double getDouble(final SharedPreferences prefs, final String key, final double default_value) {
         if (!prefs.contains(key))
             return default_value;

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.zjh.fractal.R;
 
 //轮子：BottomDrawerLayout 来自github
+//https://github.com/wangpeiming110/BottomDrawer
 
 public class BottomDrawerLayout extends ViewGroup {
 
