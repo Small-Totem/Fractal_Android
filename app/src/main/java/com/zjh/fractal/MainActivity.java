@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     public int screenHeight;
 
     private ImageView fractal;
-    private ProgressBar progress_bar;
 
     private TextView text_x;
     private TextView text_y;
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void initial_things_about_preference() {
+    private void initial_things_about_preference() {
         // 读取使用的线程数
         String thread_str = getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE)
                 .getString("thread_Preference", getResources().getStringArray(R.array.thread)[0]);
@@ -135,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 .getBoolean("generate_info_Preference", true);
     }
 
-    public void initial_view() {
+    private void initial_view() {
         SwitchCompat switch1 = findViewById(R.id.fractal_switch1);
         switch1.setOnCheckedChangeListener((buttonView, isChecked) -> flag_if_generate_now = isChecked);
         SwitchCompat switch2 = findViewById(R.id.fractal_switch2);
@@ -190,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fractal = findViewById(R.id.fractal);
-        LinearLayout generate_info_LinearLayout = findViewById(R.id.generate_info_LinearLayout);
 
         text_x = findViewById(R.id.fractal_text_x);
         text_y = findViewById(R.id.fractal_text_y);
@@ -210,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         fractal_1_5x_button = findViewById(R.id.fractal_more_btn_0);
         iteration_minus_1_button = findViewById(R.id.fractal_more_btn_11);
 
-        progress_bar = findViewById(R.id.generating);
+        ProgressBar progress_bar = findViewById(R.id.generating);
 
         generate_info_ProgressBar = new ProgressBar[10];
         generate_info_ProgressBar[0] = findViewById(R.id.progress_0);
@@ -224,8 +222,9 @@ public class MainActivity extends AppCompatActivity {
         generate_info_ProgressBar[8] = findViewById(R.id.progress_8);
         generate_info_ProgressBar[9] = findViewById(R.id.progress_9);
 
-        ScrollView sv = findViewById(R.id.generate_info_ScrollView);
-        log_view = new ZLogView(this, generate_info_LinearLayout, sv);
+        LinearLayout generate_info_LinearLayout = findViewById(R.id.generate_info_LinearLayout);
+        ScrollView generate_info_ScrollView = findViewById(R.id.generate_info_ScrollView);
+        log_view = new ZLogView(this, generate_info_LinearLayout, generate_info_ScrollView, progress_bar);
     }
 
     @Override
@@ -269,14 +268,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void generate(double quality, boolean use_transition_animation) {
-        if (flag_is_generating) {
-            log_view.info_add(info_status_warning, "由于渲染未完成，取消了一次渲染请求");
+        if(log_view.start_task(true,null,true))
             return;
-        }
-        flag_is_generating = true;
-        pixel_times = quality;
 
-        log_view.clear();
+        pixel_times = quality;
 
         if (!flag_monitor_generate_info)
             log_view.info_add(info_status_hint, "渲染信息监视已关闭");
@@ -287,12 +282,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         update_info();
+
         if (flag_monitor_generate_info)
             init_progress_threads();
 
         final MainActivity m = this;
         new Thread(() -> {
-            show_generating_icon();
             long time = System.currentTimeMillis();
 
             log_view.info_add(ContextCompat.getColor(this, R.color.grey),
@@ -311,35 +306,19 @@ public class MainActivity extends AppCompatActivity {
             log_view.info_add(ContextCompat.getColor(this, R.color.grey),
                     "共花费" + nf.format(time_d) + "秒,占用" + nf.format(storage) + "MB");
 
-            // 在thread里面更新view就要这样写
+            Bitmap bitmap = Tools.GetLocalBitmap(file_path, m);
             runOnUiThread(() -> {
-                Bitmap bitmap = Tools.GetLocalBitmap(file_path, m);
                 if (use_transition_animation) {
                     AnimationForView.transition_animation(fractal, getApplicationContext(), bitmap, image_change_time);
                 } else {
                     fractal.setImageBitmap(bitmap);
                 }
-                flag_is_generating = false;
+                log_view.close_task();
             });
         }).start();
     }
 
-    public void show_generating_icon() {
-        new Thread(() -> {
-            while (flag_is_generating) {
-                if (progress_bar.getVisibility() == View.INVISIBLE) {
-                    runOnUiThread(() -> progress_bar.setVisibility(View.VISIBLE));
-                }
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignored) {
-                }
-            }
-            AnimationForView.close_view(progress_bar, 200, 1f, View.INVISIBLE);
-        }).start();
-    }
-
-    public void init_progress_threads() {
+    private void init_progress_threads() {
         if (generate_progress_thread.length != use_thread) {
             generate_progress_thread = new double[use_thread];
         }
@@ -355,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
                         p.setProgress((int) (generate_progress_thread[temp_thread_id] * 100));
                         Thread.sleep(generate_progress_wait_time);
                     } catch (InterruptedException e) {
+                        e.printStackTrace();
                         break;
                     }
                 }
@@ -386,19 +366,19 @@ public class MainActivity extends AppCompatActivity {
         generate_progress_thread = a;
     }
 
-    private int boolean_to_int(boolean b) {
+    public int boolean_to_int(boolean b) {
         if (b)
             return 1;
         return 0;
     }
 
-    private int get_iteration_auto_max() {
+    public int get_iteration_auto_max() {
         if (auto_iteration)
             return auto_iteration_max;
         return 0;
     }
 
-    public void update_info() {
+    private void update_info() {
         display_color_reversal = false;
         if (scale_times > scale_max)
             scale_times = scale_max;

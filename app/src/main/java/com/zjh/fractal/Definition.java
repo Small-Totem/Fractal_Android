@@ -35,7 +35,6 @@ public class Definition {
     public static boolean flag_should_change_data = true;/* 只有当程序启动时，这个值为true，随后一直为false
     (确保flag_use_data的改变在程序启动后只发生一次)*/
 
-    public static boolean flag_is_generating=false;//用于标识当前正在渲染，防止渲染过程中又调用渲染
     public static boolean flag_use_transition_animation=true;
     public static boolean flag_monitor_generate_info=true;
 

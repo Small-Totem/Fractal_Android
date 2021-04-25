@@ -17,6 +17,14 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define GENERATE_INFO_ADD(mode,text) (*env)->CallVoidMethod(env, gs_object, method_generate_info_add, mode, char_to_jstring(env, text))
 
+#define INFO_STATUS_NORMAL      0
+#define INFO_STATUS_HINT        1
+#define INFO_STATUS_WARNING     2
+#define INFO_STATUS_ERROR       3
+#define INFO_TEXT_GREY          4
+#define INFO_TEXT_GREEN         5
+
+
 static int static_id = 0;
 static int static_color_reversal = 0;
 static int static_generate_mode = 0;
@@ -704,7 +712,7 @@ void *multithread_generate(void *arg)
     if (static_flag_monitor_generate_info)
         static_generate_progress_thread[tmp.thread_id]=1;
 
-    generate_info_output(4,get_string_from_text_num_text("线程", tmp.thread_id, "结束"));
+    generate_info_output(INFO_TEXT_GREY,get_string_from_text_num_text("线程", tmp.thread_id, "结束"));
 
     pthread_exit(0);
 }
@@ -760,13 +768,13 @@ void generate()
             symmetrical_generate(data);
 
         static_flag_if_finished=1;
-        generate_info_output(0,"渲染完成,正在写入");
+        generate_info_output(INFO_STATUS_NORMAL,"渲染完成,正在写入");
 
         FILE *file = fopen(static_file_path, "wb");
         svpng(file, (static_PIXEL_X), (static_PIXEL_Y), data, 0);
         fclose(file);
         free(data);
-        generate_info_output(5,"完成");
+        generate_info_output(INFO_TEXT_GREEN,"完成");
         return;
     }
 
@@ -848,13 +856,13 @@ void generate()
 
         static_flag_if_finished=1;
 
-        generate_info_output(0,"渲染完成,正在写入");
+        generate_info_output(INFO_STATUS_NORMAL,"渲染完成,正在写入");
 
         FILE *file = fopen(static_file_path, "wb");
         svpng(file, (static_PIXEL_X), (static_PIXEL_Y), data, 0);
         fclose(file);
         free(data);
-        generate_info_output(5,"完成");
+        generate_info_output(INFO_TEXT_GREEN,"完成");
         return;
     }
 }
@@ -882,7 +890,7 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
     static_flag_monitor_generate_info = monitor_generate_info;
     static_flag_if_finished=0;
 
-    generate_info_output(4,"JNI调用开始");
+    generate_info_output(INFO_TEXT_GREY,"JNI调用开始");
 
     for(int i=0;i<10;i++){
         static_generate_progress_thread[i]=0;
@@ -890,7 +898,7 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
     if (static_CENTER_Y == 0 && ((static_id <= 4 && static_id >= -1) || static_id == 15))
     {
         static_flag_should_use_symmetrical_generate = 1;
-        generate_info_output(0,"启用对称渲染加速");
+        generate_info_output(INFO_STATUS_NORMAL,"启用对称渲染加速");
     }
     else
     {
@@ -898,7 +906,7 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
     }
 
     //输出 启用x线程渲染
-    generate_info_output(0,get_string_from_text_num_text("启用", static_use_thread, "线程渲染"));
+    generate_info_output(INFO_STATUS_NORMAL,get_string_from_text_num_text("启用", static_use_thread, "线程渲染"));
 
     pthread_t progress_thread;
 
@@ -910,7 +918,7 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
     if (monitor_generate_info)
         pthread_join(progress_thread, NULL);
 
-    generate_info_output(4,"JNI调用结束");
+    generate_info_output(INFO_TEXT_GREY,"JNI调用结束");
 }
 
 JNIEXPORT void JNICALL

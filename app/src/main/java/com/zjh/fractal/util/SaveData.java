@@ -7,8 +7,8 @@ public class SaveData {
         return context.getSharedPreferences("info", Context.MODE_PRIVATE);
     }
 
-    static SharedPreferences.Editor putDouble(final SharedPreferences.Editor edit, final String key, final double value) {
-        return edit.putLong(key, Double.doubleToRawLongBits(value));
+    static void putDouble(final SharedPreferences.Editor edit, final String key, final double value) {
+        edit.putLong(key, Double.doubleToRawLongBits(value));
     }
 
     static double getDouble(final SharedPreferences prefs, final String key, final double default_value) {
