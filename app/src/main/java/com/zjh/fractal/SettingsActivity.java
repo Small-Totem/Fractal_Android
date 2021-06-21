@@ -1,16 +1,23 @@
 package com.zjh.fractal;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +28,6 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.zjh.fractal.util.ActivityManager;
 import com.zjh.fractal.util.SaveData;
-import com.zjh.fractal.util.Tools;
 
 import static com.zjh.fractal.Definition.*;
 import static com.zjh.fractal.view.ZLogView.info_status_error;
@@ -35,6 +41,14 @@ public class SettingsActivity extends AppCompatActivity {
     EditText et6;
     EditText et7;
     private Context context;
+
+    //这个是为了日夜模式切换的过渡动画,有一点点复杂
+    //由于切换的时候会短暂黑屏,暂时用一个不太完美的方案实现过渡动画:
+    //  先来一个FrameLayout渐变黑屏,然后
+    //  由于AppCompatDelegate.setDefaultNightMode()会recreate()
+    //  在recreate()之后,用下面这个标识使用进入的过渡动画(在onStart())
+    //      即渐变黑屏->黑屏recreate()->从黑屏渐变到正常状态
+    static boolean should_use_enter_animation=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +65,31 @@ public class SettingsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(should_use_enter_animation){
+            FrameLayout f=findViewById(R.id.settings_root);
+            FrameLayout f_new = new FrameLayout(this);
+            f_new.setClickable(true);
+            f_new.setBackgroundColor(Color.BLACK);
+            f_new.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            AlphaAnimation aa = new AlphaAnimation(1f,0f);
+            aa.setDuration(500);
+            aa.setAnimationListener(new Animation.AnimationListener() {
+                public void onAnimationEnd(Animation animation) {
+                    ((FrameLayout)f_new.getParent()).removeView(f_new);
+                }
+                public void onAnimationRepeat(Animation animation) {}
+                public void onAnimationStart(Animation animation) {}
+            });
+            f.addView(f_new);
+            f_new.startAnimation(aa);
+            should_use_enter_animation=false;
+        }
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat
@@ -70,6 +108,7 @@ public class SettingsActivity extends AppCompatActivity {
         Preference transition_Preference;
         Preference generate_info_Preference;
         Preference exit_Preference;
+        Preference paint_mode_Preference;
 
         boolean flag_if_first_click_for_recovery = true;
         boolean flag_if_first_click_for_exit = true;
@@ -95,30 +134,56 @@ public class SettingsActivity extends AppCompatActivity {
             transition_Preference = findPreference("transition_Preference");
             generate_info_Preference = findPreference("generate_info_Preference");
             exit_Preference = findPreference("exit_Preference");
+            paint_mode_Preference = findPreference("paint_mode_Preference");
 
-            night_mode_Preference.setOnPreferenceClickListener(this);
-            color_reverse_Preference.setOnPreferenceClickListener(this);// 其实不应该设置成onclick 而应该是onchange 下次一定
+            night_mode_Preference.setOnPreferenceClickListener(this);// 其实不应该设置成onclick 而应该是onchange 下次一定
+            color_reverse_Preference.setOnPreferenceClickListener(this);
             read_data_Preference.setOnPreferenceClickListener(this);
             open_picture_Preference.setOnPreferenceClickListener(this);
             about_fractal_Preference.setOnPreferenceClickListener(this);
             auto_iteration_Preference.setOnPreferenceClickListener(this);
             transition_Preference.setOnPreferenceClickListener(this);
             generate_info_Preference.setOnPreferenceClickListener(this);
+            exit_Preference.setOnPreferenceClickListener(this);
+
             fractal_id_Preference.setOnPreferenceChangeListener(this);
             generate_mode_Preference.setOnPreferenceChangeListener(this);
             samples_Preference.setOnPreferenceChangeListener(this);
             thread_Preference.setOnPreferenceChangeListener(this);
-            exit_Preference.setOnPreferenceClickListener(this);
+            paint_mode_Preference.setOnPreferenceChangeListener(this);
         }
 
         @Override
         public boolean onPreferenceClick(Preference preference) {
             if (preference.equals(night_mode_Preference)) {
-                if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                }
+
+                //fixme 不知道这里的FrameLayout会不会越来越多,待验证
+                //做了个勉勉强强的动画
+                should_use_enter_animation=true;
+                FrameLayout f=requireActivity().findViewById(R.id.settings_root);
+                FrameLayout f_new = new FrameLayout(getContext());
+                f_new.setClickable(true);
+                f_new.setBackgroundColor(Color.BLACK);
+                f_new.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+                AlphaAnimation aa = new AlphaAnimation(0f,1f);
+                aa.setDuration(200);
+                aa.setAnimationListener(new Animation.AnimationListener() {
+                    public void onAnimationEnd(Animation animation) {
+                        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        } else {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        }
+                    }
+                    public void onAnimationRepeat(Animation animation) {}
+                    public void onAnimationStart(Animation animation) {}
+                });
+                requireActivity().runOnUiThread(()->{
+                    f.addView(f_new);
+                    f_new.startAnimation(aa);
+                });
+
                 flag_should_load_from_storage = true;
             } else if (preference.equals(color_reverse_Preference)) {
                 color_reversal = !color_reversal;
@@ -145,11 +210,21 @@ public class SettingsActivity extends AppCompatActivity {
             } else if (preference.equals(open_picture_Preference)) {
                 // 轮子:打开图片
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                Bitmap bitmap = Tools.GetLocalBitmap(file_path,
-                        (MainActivity) ActivityManager.activityLinkedList.get(0));
+
+                ImageView fractal=((MainActivity) ActivityManager.activityLinkedList.get(0)).fractal;
+                Bitmap bitmap;
+                if((fractal.getDrawable() instanceof BitmapDrawable)){
+                    //第一次进去的时候是BitmapDrawable
+                    bitmap=((BitmapDrawable)fractal.getDrawable()).getBitmap();
+                }
+                else {
+                    BitmapDrawable old=(BitmapDrawable)((TransitionDrawable) fractal.getDrawable()).getDrawable(1);
+                    bitmap= old.getBitmap();
+                }
+
                 try {
                     String uriString = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(),
-                            bitmap, Long.toString(System.currentTimeMillis()), null);
+                            bitmap, Long.toString(System.currentTimeMillis()), "null");
                     Uri uri = Uri.parse(uriString);
                     intent.setDataAndType(uri, "image/*");
                     startActivity(intent);
@@ -172,7 +247,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 // requireActivity().finish();
 
-                MainActivity.am.exitApp();
+                MainActivity.am.exit();
             }
             return false;
         }
@@ -231,6 +306,15 @@ public class SettingsActivity extends AppCompatActivity {
                         // i=1->use_thread=2->2线程
                         if (use_thread < 1)
                             use_thread = 1;
+                        return true;
+                    }
+                }
+            } else if (preference.equals(paint_mode_Preference)) {
+                final String[] str = getResources().getStringArray(R.array.paint_mode);
+                flag_should_reload = true;
+                for (int i = 0; i < str.length; i++) {
+                    if (str[i].equals(new_str)) {
+                        paint_mode = i;
                         return true;
                     }
                 }

@@ -47,6 +47,7 @@
             app:title="恢复上一次退出时的参数"
             app:iconSpaceReserved="false"/>
 
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="显示"
@@ -74,15 +75,21 @@
             app:title="监视渲染信息"
             app:summary="开启会占用一点点性能"
             app:defaultValue="true"
-            app:iconSpaceReserved="false"
-            />
+            app:iconSpaceReserved="false" />
         <ListPreference
             app:key="thread_Preference"
             app:title="多线程渲染"
             app:dialogTitle="多线程渲染"
             app:entries="@array/thread"
             app:entryValues="@array/thread"
-            app:defaultValue="aaa"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <ListPreference
+            app:key="paint_mode_Preference"
+            app:title="绘制模式"
+            app:dialogTitle="请选择绘制模式"
+            app:entries="@array/paint_mode"
+            app:entryValues="@array/paint_mode"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false" />
     </PreferenceCategory>

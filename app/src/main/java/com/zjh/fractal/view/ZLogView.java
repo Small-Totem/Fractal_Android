@@ -74,7 +74,7 @@ public class ZLogView {
             load_view(doing_task_ProgressBar,300,1);
 
         if(using_scroll_down)
-            scroll_down_enabled(using_scroll_down);
+            scroll_down_enabled(true);
         if(name!=null)
             info_add(Color.GREEN,name);
         flag_if_using_log=true;
@@ -157,8 +157,8 @@ public class ZLogView {
         builder.setSpan(span_light_blue,0,1,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         switch (mode){
-            case info_status_normal:
-                break;
+            /*case info_status_normal:
+                break;*/
             case info_status_hint:
                 builder.append("提示:");
                 builder.setSpan(span_yellow, 2, builder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

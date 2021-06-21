@@ -15,4 +15,6 @@
     <color name="yellow">#FFEB3B</color>
     <color name="grey">#7E7E7E</color>
     <color name="green">#23FF2C</color>
+
+    <color name="button_color">#D7D7D7</color>
 </resources>

@@ -39,6 +39,7 @@ static double static_scale = 0;
 static double static_CENTER_X = 0;
 static double static_CENTER_Y = 0;
 static char* static_file_path;
+static uint8_t* curr_data=NULL;
 
 //线程渲染进度监视改进：
 //在native层新建jdoublearray 把 static_generate_progress_thread[10]的数据放进去，然后传入java，再在java更新进度条
@@ -744,9 +745,11 @@ void *post_generate_progress(void *arg)
     pthread_exit(0);
 }
 
-void generate()
+uint8_t * generate(int return_byte_array)
 {
     uint8_t *data = (uint8_t *)malloc((static_PIXEL_Y) * (static_PIXEL_X)*3);
+
+    curr_data=data;
 
     //多线程
     if (static_use_thread > 1 && static_PIXEL_Y >= 20)
@@ -768,6 +771,10 @@ void generate()
             symmetrical_generate(data);
 
         static_flag_if_finished=1;
+        if(return_byte_array!=0){
+            return data;
+        }
+
         generate_info_output(INFO_STATUS_NORMAL,"渲染完成,正在写入");
 
         FILE *file = fopen(static_file_path, "wb");
@@ -775,7 +782,7 @@ void generate()
         fclose(file);
         free(data);
         generate_info_output(INFO_TEXT_GREEN,"完成");
-        return;
+        return NULL;
     }
 
     //普通
@@ -856,6 +863,10 @@ void generate()
 
         static_flag_if_finished=1;
 
+        if(return_byte_array!=0){
+            return data;
+        }
+
         generate_info_output(INFO_STATUS_NORMAL,"渲染完成,正在写入");
 
         FILE *file = fopen(static_file_path, "wb");
@@ -863,18 +874,19 @@ void generate()
         fclose(file);
         free(data);
         generate_info_output(INFO_TEXT_GREEN,"完成");
-        return;
+        return NULL;
     }
 }
 
-JNIEXPORT void JNICALL
+JNIEXPORT jbyteArray JNICALL
 Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
                              jint screen_height, jint screen_width,
                              jdouble center_x, jdouble center_y,
                              jdouble scale_times, jint fractal_id,
                              jint color_reversal, jint generate_mode,
                              jint iteration_times, jint use_thread,
-                             jint auto_iteration_max, jint monitor_generate_info)
+                             jint auto_iteration_max, jint monitor_generate_info,
+                             jint return_byte_array)
 {
     static_id = fractal_id;
     static_color_reversal = color_reversal;
@@ -913,12 +925,20 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
     if (monitor_generate_info)
         pthread_create(&progress_thread, NULL, post_generate_progress, NULL);
 
-    generate();
+    uint8_t *p=generate(return_byte_array);
 
     if (monitor_generate_info)
         pthread_join(progress_thread, NULL);
 
     generate_info_output(INFO_TEXT_GREY,"JNI调用结束");
+
+    if(return_byte_array){
+        jbyteArray jbytes = (*env)->NewByteArray(env,(static_PIXEL_Y) * (static_PIXEL_X) * 3);
+        (*env)->SetByteArrayRegion(env, jbytes, 0, (static_PIXEL_Y) * (static_PIXEL_X) * 3, (jbyte*)p);
+        return jbytes;
+    }
+    else
+        return NULL;
 }
 
 JNIEXPORT void JNICALL
@@ -934,4 +954,10 @@ Java_com_zjh_fractal_MainActivity_init(JNIEnv *env, jobject thiz, jstring j_path
                                                           "get_progress_from_native", "([DI)V");
 
     static_file_path = (char*) (*env)->GetStringUTFChars(env, j_path, JNI_FALSE);
+}
+
+JNIEXPORT void JNICALL
+Java_com_zjh_fractal_MainActivity_notify_1free_1data(JNIEnv *env, jobject thiz) {
+    if(curr_data!=NULL)
+        free(curr_data);
 }

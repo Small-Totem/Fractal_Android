@@ -179,6 +179,7 @@
             app:layout_constraintEnd_toStartOf="@id/settings_b2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/round_button_with_ripple"
             android:onClick="settings_load"
             android:text="加载"
             />
@@ -187,12 +188,12 @@
             android:id="@+id/settings_b2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/round_button_with_ripple"
             android:onClick="settings_confirm"
             android:text="执行"
             app:layout_constraintEnd_toStartOf="@id/settings_b3"
             app:layout_constraintStart_toEndOf="@id/settings_b1"
             app:layout_constraintTop_toTopOf="parent"
-
             />
         <Button
             android:id="@+id/settings_b3"
@@ -201,6 +202,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/round_button_with_ripple"
             android:onClick="settings_clear"
             android:text="清空"
             />

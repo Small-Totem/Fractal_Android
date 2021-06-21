@@ -53,7 +53,7 @@ public class ActivityManager extends Application {
         });
     }
 
-    public void exitApp() {
+    public void exit() {
         // 逐个退出Activity
         for (Activity activity : activityLinkedList) {
             activity.finish();

@@ -82,4 +82,10 @@
         <item>8线程</item>
         <item>10线程</item>
     </string-array>
+
+    <string-array name="paint_mode">
+        <item>svpng</item>
+        <item>canvas</item>
+        <item>canvas/不修正色彩</item>
+    </string-array>
 </resources>

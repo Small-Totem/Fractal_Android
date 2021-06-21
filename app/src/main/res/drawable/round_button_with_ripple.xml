@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--相当于做了一张圆角的图片,然后给button作为背景图片-->
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/white_for_ripple">
+    <!--item里面写的是padding,类似于margin-->
+    <item
+        android:top="6dp"
+        android:bottom="6dp"
+        android:start="2dp"
+        android:end="2dp">
+        <shape
+            android:shape="rectangle">
+            <!--设置背景色-->
+            <solid
+                android:color="@color/button_color" />
+            <!--设置圆角-->
+            <corners
+                android:radius="140dip" />
+        </shape>
+    </item>
+</ripple>
+
