@@ -19,8 +19,6 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -29,6 +27,7 @@ import com.zjh.fractal.util.ActivityManager;
 import com.zjh.fractal.util.AnimationForView;
 import com.zjh.fractal.util.SaveData;
 import com.zjh.fractal.util.Tools;
+import com.zjh.fractal.view.DragFractalView;
 import com.zjh.fractal.view.ZLogView;
 
 import java.math.RoundingMode;
@@ -41,27 +40,27 @@ public class MainActivity extends AppCompatActivity {
     public int screenWidth;
     public int screenHeight;
 
-    public ImageView fractal;
+    public DragFractalView fractal;
 
-    private TextView text_x;
-    private TextView text_y;
-    private TextView text_pixel;
-    private TextView text_scale;
-    private TextView text_reversal;
-    private TextView text_generate_mode;
-    private TextView text_generate_id;
-    private TextView text_text_iteration;
+    public TextView TextView_re;
+    public TextView TextView_im;
+    public TextView TextView_scale;
+    public TextView TextView_pixel;
+    private TextView TextView_reversal;
+    private TextView TextView_generate_mode;
+    private TextView TextView_generate_id;
+    private TextView TextView_iteration;
 
-    private AppCompatButton fractal_double_button;
-    private AppCompatButton fractal_1_5x_button;
-    private AppCompatButton iteration_double_button;
-    private AppCompatButton iteration_half_button;
-    private AppCompatButton iteration_minus_1_button;
-    private AppCompatButton generate_color_reverse_button;
-    private AppCompatButton display_color_reverse_button;
-    private AppCompatButton auto_iteration_button;
+    private AppCompatButton AppCompatButton_fractal_double;
+    private AppCompatButton AppCompatButton_fractal_1_5x;
+    private AppCompatButton AppCompatButton_iteration_double;
+    private AppCompatButton AppCompatButton_iteration_half;
+    private AppCompatButton AppCompatButton_iteration_minus_1;
+    private AppCompatButton AppCompatButton_generate_color_reverse;
+    private AppCompatButton AppCompatButton_display_color_reverse;
+    private AppCompatButton AppCompatButton_auto_iteration;
 
-    private ProgressBar[] generate_info_ProgressBar;
+    private ProgressBar[] ProgressBar_generate_info;
     private ZLogView log_view;
 
     // 监视每个线程的进度
@@ -71,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
     static {
         System.loadLibrary("fractal");
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        am = new ActivityManager();
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);//todo
+        am = new ActivityManager();//todo这两句要删掉?
     }
 
     @Override
@@ -90,8 +89,6 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);// 隐藏状态栏
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);// 导航栏透明
 
-        file_path = Tools.getFileRoot(this) + "/fractal.png";
-
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getRealMetrics(dm);
         screenWidth = dm.widthPixels;
@@ -99,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
 
         initial_things_about_preference();
         initial_view();
+
+        file_path = Tools.getFileRoot(this) + "/fractal.png";
         init(file_path);
 
         generate_progress_thread = new double[use_thread];
@@ -107,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
             log_view.info_add(info_status_hint, "布局已重载");
         }
     }
+
 
     @Override
     protected void onPause() {
@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         if (flag_should_change_data) {
             // 处理进入程序的第一次渲染
-            // 第一次渲染不使用多线更新ui的方式，这样虽然会慢一点但是不会因为图片加载而闪烁一下
-            GenerateFractal((int) (screenHeight * pixel_times), (int) (screenWidth * pixel_times), center_x, center_y,
+            // 第一次渲染不使用多线程更新ui的方式，这样虽然会慢一点但是不会因为图片加载而闪烁一下
+            GenerateFractal((int) (screenHeight * pixel_times), (int) (screenWidth * pixel_times), center_re, center_im,
                     scale_times * pixel_times, fractal_id, boolean_to_int(color_reversal), generate_mode,
                     iteration_times, use_thread, get_iteration_auto_max(), 0,0);
             update_info();
@@ -157,34 +157,38 @@ public class MainActivity extends AppCompatActivity {
 
     private void initial_things_about_preference() {
         // 读取使用的线程数
+        final String[] R_array_thread = getResources().getStringArray(R.array.thread);
         String thread_str = getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE)
-                .getString("thread_Preference", /*默认值*/ getResources().getStringArray(R.array.thread)[0]);
-        final String[] str = getResources().getStringArray(R.array.thread);
-        for (int i = 0; i < str.length; i++) {
-            if (str[i].equals(thread_str)) {
+                .getString("thread_Preference", /*默认值*/ R_array_thread[use_thread/2]);//use_thread与数组的映射关系
+
+        final String[] R_array_paint_mode = getResources().getStringArray(R.array.paint_mode);
+        String paint_mode_str = getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE)
+                .getString("paint_mode_Preference", R_array_paint_mode[paint_mode]);
+
+        //以下两句乍一看没有意义,其实是为了防止在第一次安装时Preference的值为'未设置'
+        //可能有更好的解决方案?(直接写在静态的xml不太好,因为我想在Definition.java指定初始值)
+        getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit().putString("thread_Preference",
+                thread_str).apply();
+        getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit().putString("paint_mode_Preference",
+                paint_mode_str).apply();
+
+        //把Preferences里面的string解析成int
+        for (int i = 0; i < R_array_thread.length; i++) {
+            if (R_array_thread[i].equals(thread_str)) {
                 use_thread = i * 2;
-                if (use_thread < 1){
+                if (use_thread < 1)
                     use_thread = 1;
-                    // 防止第一次启动程序时thread_Preference的值为空
-                    getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
-                            .putString("thread_Preference", str[0]).apply();
-                }
                 break;
             }
         }
 
-        String paint_mode_str = getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE)
-                .getString("paint_mode_Preference", getResources().getStringArray(R.array.paint_mode)[0]);
-        final String[] str1 = getResources().getStringArray(R.array.paint_mode);
-        for (int i = 0; i < str1.length; i++) {
-            if (str1[i].equals(paint_mode_str)) {
+        for (int i = 0; i < R_array_paint_mode.length; i++) {
+            if (R_array_paint_mode[i].equals(paint_mode_str)) {
                 paint_mode = i;
-                if(i==0)
-                    getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
-                            .putString("paint_mode_Preference", str1[0]).apply();
                 break;
             }
         }
+
 
         // 设置SharedPreferences中的日夜模式为夜间(即启动时默认为夜间模式)
         getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit().putBoolean("night_mode_Preference",
@@ -199,9 +203,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initial_view() {
-        SwitchCompat switch1 = findViewById(R.id.fractal_switch1);
+        SwitchCompat switch1 = findViewById(R.id.fractal_switch_generate_now);
         switch1.setOnCheckedChangeListener((buttonView, isChecked) -> flag_if_generate_now = isChecked);
-        SwitchCompat switch2 = findViewById(R.id.fractal_switch2);
+        SwitchCompat switch2 = findViewById(R.id.fractal_switch_transparent);
         switch2.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ConstraintLayout C2 = findViewById(R.id.fractal_ConstraintLayout2);
             ConstraintLayout C3 = findViewById(R.id.fractal_ConstraintLayout3);
@@ -224,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
                  */
             }
         });
-        SwitchCompat switch3 = findViewById(R.id.fractal_switch3);
+        SwitchCompat switch3 = findViewById(R.id.fractal_switch_more);
         switch3.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ConstraintLayout C3 = findViewById(R.id.fractal_ConstraintLayout3);
             if (isChecked) {
@@ -233,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                 AnimationForView.close_view(C3, 200, 1f, View.INVISIBLE);
             }
         });
-        SwitchCompat switch4 = findViewById(R.id.fractal_switch4);
+        SwitchCompat switch4 = findViewById(R.id.fractal_switch_axis);
         switch4.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ConstraintLayout v = findViewById(R.id.axis);
             if (isChecked) {
@@ -242,54 +246,65 @@ public class MainActivity extends AppCompatActivity {
                 AnimationForView.close_view(v, 200, 1f, View.GONE);
             }
         });
-        SwitchCompat switch5 = findViewById(R.id.fractal_switch5);
-        switch5.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            ConstraintLayout v = findViewById(R.id.generate_info);
-            if (isChecked) {
-                AnimationForView.load_view(v, 200, 1f);
-                log_view.scroll_down();
-            } else {
-                AnimationForView.close_view(v, 200, 1f, View.GONE);
-            }
+        SwitchCompat switch5 = findViewById(R.id.fractal_switch_generate_info);
+
+        //注意 不能在onCreate里面用View.getHeight(),会返回0(因为View还没创建好)
+        //需要post到ui线程的消息队列里面(等view初始化完之后)
+        View view_generate_info=findViewById(R.id.generate_info);
+        view_generate_info.post(() ->{
+            AnimationForView.ObjectAnimator_scroll_form_top anim=
+                    new AnimationForView.ObjectAnimator_scroll_form_top(view_generate_info,
+                            Tools.dp2px(this,220));//220是view_generate_info的高 虽然这样不够好但是就这样吧
+            switch5.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    //AnimationForView.load_view(v, 200, 1f);
+                    anim.in();
+                    log_view.scroll_down();
+                } else {
+                    //AnimationForView.close_view(v, 200, 1f, View.GONE);
+                    anim.out();
+                }
+            });
         });
+
+
 
         fractal = findViewById(R.id.fractal);
 
-        text_x = findViewById(R.id.fractal_text_x);
-        text_y = findViewById(R.id.fractal_text_y);
-        text_pixel = findViewById(R.id.fractal_text_pixel);
-        text_scale = findViewById(R.id.fractal_text_scale);
-        text_reversal = findViewById(R.id.fractal_text_reversal);
-        text_generate_mode = findViewById(R.id.fractal_text_generate_mode);
-        text_generate_id = findViewById(R.id.fractal_text_generate_id);
-        text_text_iteration = findViewById(R.id.fractal_text_iteration);
-        fractal_double_button = findViewById(R.id.fractal_btn3);
+        TextView_re = findViewById(R.id.fractal_text_re);
+        TextView_im = findViewById(R.id.fractal_text_im);
+        TextView_pixel = findViewById(R.id.fractal_text_pixel);
+        TextView_scale = findViewById(R.id.fractal_text_scale);
+        TextView_reversal = findViewById(R.id.fractal_text_reversal);
+        TextView_generate_mode = findViewById(R.id.fractal_text_generate_mode);
+        TextView_generate_id = findViewById(R.id.fractal_text_generate_id);
+        TextView_iteration = findViewById(R.id.fractal_text_iteration);
+        AppCompatButton_fractal_double = findViewById(R.id.fractal_btn3);
 
-        iteration_double_button = findViewById(R.id.fractal_more_btn_8);
-        iteration_half_button = findViewById(R.id.fractal_more_btn_9);
-        generate_color_reverse_button = findViewById(R.id.fractal_more_btn_7);
-        display_color_reverse_button = findViewById(R.id.fractal_more_btn_6);
-        auto_iteration_button = findViewById(R.id.fractal_more_btn_3);
-        fractal_1_5x_button = findViewById(R.id.fractal_more_btn_0);
-        iteration_minus_1_button = findViewById(R.id.fractal_more_btn_11);
+        AppCompatButton_iteration_double = findViewById(R.id.fractal_more_btn_8);
+        AppCompatButton_iteration_half = findViewById(R.id.fractal_more_btn_9);
+        AppCompatButton_generate_color_reverse = findViewById(R.id.fractal_more_btn_7);
+        AppCompatButton_display_color_reverse = findViewById(R.id.fractal_more_btn_6);
+        AppCompatButton_auto_iteration =  findViewById(R.id.fractal_more_btn_3);
+        AppCompatButton_fractal_1_5x = findViewById(R.id.fractal_more_btn_0);
+        AppCompatButton_iteration_minus_1 = findViewById(R.id.fractal_more_btn_11);
 
         ProgressBar progress_bar = findViewById(R.id.generating);
 
-        generate_info_ProgressBar = new ProgressBar[10];
-        generate_info_ProgressBar[0] = findViewById(R.id.progress_0);
-        generate_info_ProgressBar[1] = findViewById(R.id.progress_1);
-        generate_info_ProgressBar[2] = findViewById(R.id.progress_2);
-        generate_info_ProgressBar[3] = findViewById(R.id.progress_3);
-        generate_info_ProgressBar[4] = findViewById(R.id.progress_4);
-        generate_info_ProgressBar[5] = findViewById(R.id.progress_5);
-        generate_info_ProgressBar[6] = findViewById(R.id.progress_6);
-        generate_info_ProgressBar[7] = findViewById(R.id.progress_7);
-        generate_info_ProgressBar[8] = findViewById(R.id.progress_8);
-        generate_info_ProgressBar[9] = findViewById(R.id.progress_9);
+        ProgressBar_generate_info = new ProgressBar[10];
+        ProgressBar_generate_info[0] = findViewById(R.id.progress_0);
+        ProgressBar_generate_info[1] = findViewById(R.id.progress_1);
+        ProgressBar_generate_info[2] = findViewById(R.id.progress_2);
+        ProgressBar_generate_info[3] = findViewById(R.id.progress_3);
+        ProgressBar_generate_info[4] = findViewById(R.id.progress_4);
+        ProgressBar_generate_info[5] = findViewById(R.id.progress_5);
+        ProgressBar_generate_info[6] = findViewById(R.id.progress_6);
+        ProgressBar_generate_info[7] = findViewById(R.id.progress_7);
+        ProgressBar_generate_info[8] = findViewById(R.id.progress_8);
+        ProgressBar_generate_info[9] = findViewById(R.id.progress_9);
 
-        LinearLayout generate_info_LinearLayout = findViewById(R.id.generate_info_LinearLayout);
         ScrollView generate_info_ScrollView = findViewById(R.id.generate_info_ScrollView);
-        log_view = new ZLogView(this, generate_info_LinearLayout, generate_info_ScrollView, progress_bar);
+        log_view = new ZLogView(this, generate_info_ScrollView, progress_bar);
     }
 
     public void generate(double quality, boolean use_transition_animation) {
@@ -300,14 +315,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (!flag_monitor_generate_info)
             log_view.info_add(info_status_hint, "渲染信息监视已关闭");
-
+        if (scale_times >= scale_max)
+            log_view.info_add(info_status_hint, "已达到放大上限");
         if (iteration_times * Math.pow(pixel_times, 2) >= 4000
-                || (auto_iteration_max >= 8000 && iteration_times * Math.pow(pixel_times, 2) >= 2000)) {
+                || (auto_iteration_max >= 8000 && iteration_times * Math.pow(pixel_times, 2) >= 2000))
             log_view.info_add(info_status_warning, "预计渲染耗时较长");
-        }
-        if (quality>2) {
+        if (quality>2)
             log_view.info_add(info_status_warning, "绘制分辨率过高的图片可能会导致闪退");
-        }
+
 
         update_info();
 
@@ -329,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
         if(paint_mode==1||paint_mode==2){
             new Thread(() -> {
                 long time = System.currentTimeMillis();
-                byte[] data= GenerateFractal(bitmap_y, bitmap_x, center_x, center_y,
+                byte[] data= GenerateFractal(bitmap_y, bitmap_x, center_re, center_im,
                         scale_times * pixel_times, fractal_id, boolean_to_int(color_reversal), generate_mode,
                         iteration_times, use_thread, get_iteration_auto_max(), boolean_to_int(flag_monitor_generate_info),1);
                 time = System.currentTimeMillis() - time;
@@ -378,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
             new Thread(() -> {
                 long time = System.currentTimeMillis();
 
-                GenerateFractal(bitmap_y, bitmap_x, center_x, center_y,
+                GenerateFractal(bitmap_y, bitmap_x, center_re, center_im,
                         scale_times * pixel_times, fractal_id, boolean_to_int(color_reversal), generate_mode,
                         iteration_times, use_thread, get_iteration_auto_max(), boolean_to_int(flag_monitor_generate_info),0);
 
@@ -406,10 +421,11 @@ public class MainActivity extends AppCompatActivity {
             generate_progress_thread = new double[use_thread];
         }
         // 对每个线程渲染情况的监听
+        // 总感觉轮询不是个好东西,之后改成从native层发信号过来吧(下次一定)
         for (int i = 0; i < use_thread; i++) {
             int temp_thread_id = i;
             new Thread(() -> {
-                ProgressBar p = generate_info_ProgressBar[temp_thread_id];
+                ProgressBar p = ProgressBar_generate_info[temp_thread_id];
                 runOnUiThread(() -> p.setVisibility(View.VISIBLE));
                 generate_progress_thread[temp_thread_id] = 0;
                 while (generate_progress_thread[temp_thread_id] < 1) {
@@ -472,8 +488,8 @@ public class MainActivity extends AppCompatActivity {
         if (iteration_times <= 0)
             iteration_times = 1;
 
-        String str_x = "X=" + center_x;
-        String str_y = "Y=" + center_y;
+        String str_re = "Re=" + center_re;
+        String str_im = "Im=" + center_im;
         String str_pixel = "渲染倍率=" + pixel_times;
         String str_scale = "缩放=" + scale_times;
         String str_reversal = "反转=" + color_reversal + "/" + display_color_reversal;
@@ -481,32 +497,32 @@ public class MainActivity extends AppCompatActivity {
         String str_generate_id = "ID=" + fractal_id;
         String str_iteration = "迭代=" + iteration_times;
         if (auto_iteration && iteration_times < auto_iteration_max)
-            str_iteration += "->" + auto_iteration_max;
+             str_iteration += "->" + auto_iteration_max;
 
-        text_x.setText(str_x);
-        text_y.setText(str_y);
-        text_pixel.setText(str_pixel);
-        text_scale.setText(str_scale);
-        text_reversal.setText(str_reversal);
-        text_generate_mode.setText(str_generate_mode);
-        text_generate_id.setText(str_generate_id);
-        text_text_iteration.setText(str_iteration);
+        TextView_re.setText(str_re);
+        TextView_im.setText(str_im);
+        TextView_pixel.setText(str_pixel);   
+        TextView_scale.setText(str_scale);
+        TextView_reversal.setText(str_reversal);
+        TextView_generate_mode.setText(str_generate_mode);
+        TextView_generate_id.setText(str_generate_id);
+        TextView_iteration.setText(str_iteration);
 
-        fractal_double_button.setEnabled(scale_times < scale_max); // 小于4E12时才准放大
-        fractal_1_5x_button.setEnabled(scale_times < scale_max);
-        iteration_double_button.setEnabled(iteration_times < Integer.MAX_VALUE);
-        iteration_half_button.setEnabled(iteration_times > 1);
-        iteration_minus_1_button.setEnabled(iteration_times > 1);
+        AppCompatButton_fractal_double.setEnabled(scale_times < scale_max); // 小于4E12时才准放大
+        AppCompatButton_fractal_1_5x.setEnabled(scale_times < scale_max);
+        AppCompatButton_iteration_double.setEnabled(iteration_times < Integer.MAX_VALUE);
+        AppCompatButton_iteration_half.setEnabled(iteration_times > 1);
+        AppCompatButton_iteration_minus_1.setEnabled(iteration_times > 1);
 
         if (color_reversal)
-            generate_color_reverse_button.setTextColor(ContextCompat.getColor(this, R.color.light_blue));
+            AppCompatButton_generate_color_reverse.setTextColor(ContextCompat.getColor(this, R.color.light_blue));
         else
-            generate_color_reverse_button.setTextColor(ContextCompat.getColor(this, R.color.text_color));
+            AppCompatButton_generate_color_reverse.setTextColor(ContextCompat.getColor(this, R.color.text_color));
         if (auto_iteration)
-            auto_iteration_button.setTextColor(ContextCompat.getColor(this, R.color.light_blue));
+            AppCompatButton_auto_iteration.setTextColor(ContextCompat.getColor(this, R.color.light_blue));
         else
-            auto_iteration_button.setTextColor(ContextCompat.getColor(this, R.color.text_color));
-        display_color_reverse_button.setTextColor(ContextCompat.getColor(this, R.color.text_color));
+            AppCompatButton_auto_iteration.setTextColor(ContextCompat.getColor(this, R.color.text_color));
+        AppCompatButton_display_color_reverse.setTextColor(ContextCompat.getColor(this, R.color.text_color));
 
         getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
                 .putBoolean("color_reverse_Preference", color_reversal).apply();
@@ -534,8 +550,12 @@ public class MainActivity extends AppCompatActivity {
             getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
                     .putString("generate_mode_Preference", str2[generate_mode]).apply();
         }
+        getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
+                .putInt("generate_quality_Preference", (int)(pixel_times*25)).apply();
+        getSharedPreferences("fractal_settings_Preferences", MODE_PRIVATE).edit()
+                .putInt("generate_now_quality_Preference", (int)(generate_now_quality*100)).apply();
 
-        SaveData.save_data(center_x, center_y, scale_times, color_reversal, fractal_id, generate_mode, iteration_times,
+        SaveData.save_data(center_re, center_im, scale_times, color_reversal, fractal_id, generate_mode, iteration_times,
                 auto_iteration, auto_iteration_max, getApplicationContext(), flag_use_data);
     }
 
@@ -569,46 +589,46 @@ public class MainActivity extends AppCompatActivity {
             generate(generate_now_quality, flag_use_transition_animation);
     }
     public void fractal_up(View v) {
-        center_y -= 1 / (5f * scale_times);
+        center_im -= 1 / (5f * scale_times);
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
     public void fractal_down(View v) {
-        center_y += 1 / (5f * scale_times);
+        center_im += 1 / (5f * scale_times);
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
     public void fractal_left(View v) {
-        center_x -= 1 / (5f * scale_times);
+        center_re -= 1 / (5f * scale_times);
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
     public void fractal_right(View v) {
-        center_x += 1 / (5f * scale_times);
+        center_re += 1 / (5f * scale_times);
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
     public void fractal_left_up(View v) {
-        center_y -= 1 / (5f * scale_times);
-        center_x -= 1 / (5f * scale_times);
+        center_re -= 1 / (5f * scale_times);
+        center_im -= 1 / (5f * scale_times);
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
     public void fractal_left_down(View v) {
-        center_x -= 1 / (5f * scale_times);
-        center_y += 1 / (5f * scale_times);
+        center_re -= 1 / (5f * scale_times);
+        center_im += 1 / (5f * scale_times);
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
     public void fractal_right_up(View v) {
-        center_x += 1 / (5f * scale_times);
-        center_y -= 1 / (5f * scale_times);
+        center_re += 1 / (5f * scale_times);
+        center_im -= 1 / (5f * scale_times);
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
     public void fractal_right_down(View v) {
-        center_x += 1 / (5f * scale_times);
-        center_y += 1 / (5f * scale_times);
+        center_re += 1 / (5f * scale_times);
+        center_im += 1 / (5f * scale_times);
         if (flag_if_generate_now)
             generate(generate_now_quality, flag_use_transition_animation);
     }
@@ -681,7 +701,7 @@ public class MainActivity extends AppCompatActivity {
         display_color_reversal = !display_color_reversal;
 
         String str_reversal = "反转=" + color_reversal + "/" + display_color_reversal;
-        text_reversal.setText(str_reversal);
+        TextView_reversal.setText(str_reversal);
     }
     public void iteration_auto(View v) {
         auto_iteration = !auto_iteration;

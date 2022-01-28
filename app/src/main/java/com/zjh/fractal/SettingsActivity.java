@@ -36,8 +36,6 @@ public class SettingsActivity extends AppCompatActivity {
     EditText et1;
     EditText et2;
     EditText et3;
-    EditText et4;
-    EditText et5;
     EditText et6;
     EditText et7;
     private Context context;
@@ -109,6 +107,8 @@ public class SettingsActivity extends AppCompatActivity {
         Preference generate_info_Preference;
         Preference exit_Preference;
         Preference paint_mode_Preference;
+        Preference generate_quality_Preference;
+        Preference generate_now_quality_Preference;
 
         boolean flag_if_first_click_for_recovery = true;
         boolean flag_if_first_click_for_exit = true;
@@ -135,6 +135,8 @@ public class SettingsActivity extends AppCompatActivity {
             generate_info_Preference = findPreference("generate_info_Preference");
             exit_Preference = findPreference("exit_Preference");
             paint_mode_Preference = findPreference("paint_mode_Preference");
+            generate_quality_Preference = findPreference("generate_quality_Preference");
+            generate_now_quality_Preference = findPreference("generate_now_quality_Preference");
 
             night_mode_Preference.setOnPreferenceClickListener(this);// 其实不应该设置成onclick 而应该是onchange 下次一定
             color_reverse_Preference.setOnPreferenceClickListener(this);
@@ -151,6 +153,11 @@ public class SettingsActivity extends AppCompatActivity {
             samples_Preference.setOnPreferenceChangeListener(this);
             thread_Preference.setOnPreferenceChangeListener(this);
             paint_mode_Preference.setOnPreferenceChangeListener(this);
+            generate_quality_Preference.setOnPreferenceChangeListener(this);
+            generate_now_quality_Preference.setOnPreferenceChangeListener(this);
+
+            generate_quality_Preference.setTitle("渲染倍率="+pixel_times);
+            generate_now_quality_Preference.setTitle("立即渲染倍率="+generate_now_quality);
         }
 
         @Override
@@ -252,10 +259,11 @@ public class SettingsActivity extends AppCompatActivity {
             return false;
         }
 
+        //@return:true则为更新选项的值
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            String new_str = (String) newValue;
             if (preference.equals(fractal_id_Preference)) {
+                String new_str = (String) newValue;
                 final String[] str = getResources().getStringArray(R.array.fractal_id);
                 for (int i = 0; i < str.length; i++) {
                     if (str[i].equals(new_str)) {
@@ -273,6 +281,7 @@ public class SettingsActivity extends AppCompatActivity {
                 flag_should_reload = true;
                 return true;
             } else if (preference.equals(generate_mode_Preference)) {
+                String new_str = (String) newValue;
                 final String[] str = getResources().getStringArray(R.array.generate_mode);
                 for (int i = 0; i < str.length; i++) {
                     if (str[i].equals(new_str)) {
@@ -287,6 +296,7 @@ public class SettingsActivity extends AppCompatActivity {
                 flag_should_reload = true;
                 return true;
             } else if (preference.equals(samples_Preference)) {
+                String new_str = (String) newValue;
                 final String[] str = getResources().getStringArray(R.array.samples);
                 for (int i = 0; i < str.length; i++) {
                     if (str[i].equals(new_str)) {
@@ -298,6 +308,7 @@ public class SettingsActivity extends AppCompatActivity {
                 samples_Preference.setSummary("正在渲染");
                 requireActivity().finish();
             } else if (preference.equals(thread_Preference)) {
+                String new_str = (String) newValue;
                 final String[] str = getResources().getStringArray(R.array.thread);
                 for (int i = 0; i < str.length; i++) {
                     if (str[i].equals(new_str)) {
@@ -310,6 +321,7 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 }
             } else if (preference.equals(paint_mode_Preference)) {
+                String new_str = (String) newValue;
                 final String[] str = getResources().getStringArray(R.array.paint_mode);
                 flag_should_reload = true;
                 for (int i = 0; i < str.length; i++) {
@@ -318,6 +330,22 @@ public class SettingsActivity extends AppCompatActivity {
                         return true;
                     }
                 }
+            } else if (preference.equals(generate_quality_Preference)) {
+                flag_should_reload = true;
+                double new_value = ((int)newValue)/25.0;
+                if(new_value<0.1)
+                    new_value=0.1;
+                preference.setTitle("渲染倍率="+new_value);
+                pixel_times=new_value;
+                return true;
+                //todo test
+            } else if (preference.equals(generate_now_quality_Preference)) {
+                double new_value = ((int)newValue)/100.0;
+                if(new_value<0.1)
+                    new_value=0.1;
+                preference.setTitle("立即渲染倍率="+new_value);
+                generate_now_quality=new_value;
+                return true;
             }
             return false;
         }
@@ -326,8 +354,8 @@ public class SettingsActivity extends AppCompatActivity {
     public static void get_info_from_SaveData(Context c, boolean b) {
         if (!b) {// 正在写入的SharedPreferences为A,则应读取的为B
                  // 详见MainActivity中对flag_use_data的注释
-            center_x = SaveData.get_data_double(c, "center_x_true", 0);
-            center_y = SaveData.get_data_double(c, "center_y_true", 0);
+            center_re = SaveData.get_data_double(c, "center_x_true", 0);
+            center_im = SaveData.get_data_double(c, "center_y_true", 0);
             scale_times = SaveData.get_data_double(c, "scale_times_true", 0.5);
             pixel_times = 0.1;
             color_reversal = SaveData.get_data_boolean(c, "color_reversal_true", true);
@@ -337,8 +365,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = SaveData.get_data_int(c, "iteration_times_true", 128);
             auto_iteration_max = SaveData.get_data_int(c, "auto_iteration_max_true", 2000);
         } else {
-            center_x = SaveData.get_data_double(c, "center_x_false", 0);
-            center_y = SaveData.get_data_double(c, "center_y_false", 0);
+            center_re = SaveData.get_data_double(c, "center_x_false", 0);
+            center_im = SaveData.get_data_double(c, "center_y_false", 0);
             scale_times = SaveData.get_data_double(c, "scale_times_false", 0.5);
             pixel_times = 0.1;
             color_reversal = SaveData.get_data_boolean(c, "color_reversal_false", true);
@@ -356,8 +384,8 @@ public class SettingsActivity extends AppCompatActivity {
         final int sample_id_5_num = 6;
         switch (i) {
         case 0:
-            center_x = 0.0016429555369541044;
-            center_y = -0.822466530016391;
+            center_re = 0.0016429555369541044;
+            center_im = -0.822466530016391;
             scale_times = 1024;
             pixel_times = 1;
             color_reversal = false;
@@ -366,8 +394,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 256;
             break;
         case 1:
-            center_x = -1.766995739460482;
-            center_y = -0.04528191985965333;
+            center_re = -1.766995739460482;
+            center_im = -0.04528191985965333;
             scale_times = 1.37438e11;
             pixel_times = 1;
             color_reversal = true;
@@ -376,8 +404,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 256;
             break;
         case 2:
-            center_x = 0.3044921875;
-            center_y = 0.02265625;
+            center_re = 0.3044921875;
+            center_im = 0.02265625;
             scale_times = 512;
             pixel_times = 1;
             color_reversal = true;
@@ -386,8 +414,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 256;
             break;
         case 3:
-            center_x = 0.3604841232299804;
-            center_y = 0.6412729263305667;
+            center_re = 0.3604841232299804;
+            center_im = 0.6412729263305667;
             scale_times = 1048576;
             pixel_times = 1;
             color_reversal = true;
@@ -396,8 +424,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 2048;
             break;
         case 4:
-            center_x = 0.3604841929860413;
-            center_y = 0.6412729891948403;
+            center_re = 0.3604841929860413;
+            center_im = 0.6412729891948403;
             scale_times = 2.147483648e9;
             pixel_times = 1;
             color_reversal = false;
@@ -406,8 +434,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 2048;
             break;
         case 5:
-            center_x = 0.25260944366455;
-            center_y = -0.00021800994873;
+            center_re = 0.25260944366455;
+            center_im = -0.00021800994873;
             scale_times = 2097152;
             pixel_times = 1;
             color_reversal = true;
@@ -416,8 +444,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 4096;
             break;
         case 6:
-            center_x = 0.0010398901738078148;
-            center_y = -0.8220997150833408;
+            center_re = 0.0010398901738078148;
+            center_im = -0.8220997150833408;
             scale_times = 1.2E12;
             pixel_times = 1;
             color_reversal = true;
@@ -426,8 +454,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 8192;
             break;
         case 7:
-            center_x = -0.7506512573242186;
-            center_y = -0.020174015553792283;
+            center_re = -0.7506512573242186;
+            center_im = -0.020174015553792283;
             scale_times = 90000;
             pixel_times = 1;
             color_reversal = true;
@@ -436,8 +464,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 8192;
             break;
         case 8:
-            center_x = 0.36796875;
-            center_y = -0.14921875;
+            center_re = 0.36796875;
+            center_im = -0.14921875;
             scale_times = 8192;
             pixel_times = 1;
             color_reversal = true;
@@ -447,8 +475,8 @@ public class SettingsActivity extends AppCompatActivity {
             break;
 
         case 9:
-            center_x = -1.7496286153793283;
-            center_y = 0;
+            center_re = -1.7496286153793283;
+            center_im = 0;
             scale_times = 8388608;
             pixel_times = 1;
             color_reversal = true;
@@ -457,8 +485,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 500;
             break;
         case 10:
-            center_x = -1.4082885742185;
-            center_y = 0.1366455078125;
+            center_re = -1.4082885742185;
+            center_im = 0.1366455078125;
             scale_times = 16384;
             pixel_times = 1;
             color_reversal = true;
@@ -468,8 +496,8 @@ public class SettingsActivity extends AppCompatActivity {
             break;
 
         case sample_id_0_num:
-            center_x = 0.14709487090110732;
-            center_y = -0.8748064100742339;
+            center_re = 0.14709487090110732;
+            center_im = -0.8748064100742339;
             scale_times = 1234;
             pixel_times = 1;
             color_reversal = true;
@@ -478,8 +506,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 200;
             break;
         case sample_id_0_num + 1:
-            center_x = -0.81867175;
-            center_y = -0.5589480412666;
+            center_re = -0.81867175;
+            center_im = -0.5589480412666;
             scale_times = 512;
             pixel_times = 1;
             color_reversal = true;
@@ -488,8 +516,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 200;
             break;
         case sample_id_0_num + 2:
-            center_x = -0.0859375;
-            center_y = -1.05417;
+            center_re = -0.0859375;
+            center_im = -1.05417;
             scale_times = 192;
             pixel_times = 1;
             color_reversal = false;
@@ -498,8 +526,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 200;
             break;
         case sample_id_0_num + sample_id_3_num:
-            center_x = -1.75;
-            center_y = -0.03;
+            center_re = -1.75;
+            center_im = -0.03;
             scale_times = 24;
             pixel_times = 1;
             color_reversal = true;
@@ -508,8 +536,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 128;
             break;
         case sample_id_0_num + sample_id_3_num + 1:
-            center_x = -1.861344696144;
-            center_y = -0.003114566940348595;
+            center_re = -1.861344696144;
+            center_im = -0.003114566940348595;
             scale_times = 6.87E10;
             pixel_times = 1;
             color_reversal = false;
@@ -518,8 +546,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 128;
             break;
         case sample_id_0_num + sample_id_3_num + 2:
-            center_x = -1.8101560225213849;
-            center_y = -0.00364331702183375;
+            center_re = -1.8101560225213849;
+            center_im = -0.00364331702183375;
             scale_times = 5E12;
             pixel_times = 1;
             color_reversal = true;
@@ -528,8 +556,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 128;
             break;
         case sample_id_0_num + sample_id_3_num + 3:
-            center_x = -1.7783556904313647;
-            center_y = -0.05607528583630487;
+            center_re = -1.7783556904313647;
+            center_im = -0.05607528583630487;
             scale_times = 8E8;
             pixel_times = 1;
             color_reversal = true;
@@ -538,8 +566,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 256;
             break;
         case sample_id_0_num + sample_id_3_num + 4:
-            center_x = -1.9433338235357482;
-            center_y = -0.0020569693544075615;
+            center_re = -1.9433338235357482;
+            center_im = -0.0020569693544075615;
             scale_times = 1E12;
             pixel_times = 1;
             color_reversal = true;
@@ -548,8 +576,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 128;
             break;
         case sample_id_0_num + sample_id_3_num + 5:
-            center_x = -1.9433338235660342;
-            center_y = -0.002056970956755327;
+            center_re = -1.9433338235660342;
+            center_im = -0.002056970956755327;
             scale_times = 5E8;
             pixel_times = 1;
             color_reversal = true;
@@ -559,8 +587,8 @@ public class SettingsActivity extends AppCompatActivity {
             break;
 
         case sample_id_0_num + sample_id_3_num + sample_id_5_num:
-            center_x = -1.29175;
-            center_y = -0.02152;
+            center_re = -1.29175;
+            center_im = -0.02152;
             scale_times = 150;
             pixel_times = 1;
             color_reversal = false;
@@ -569,8 +597,8 @@ public class SettingsActivity extends AppCompatActivity {
             iteration_times = 200;
             break;
         case sample_id_0_num + sample_id_3_num + sample_id_5_num + 1:
-            center_x = -1.197229619137943;
-            center_y = -0.1428861228865572;
+            center_re = -1.197229619137943;
+            center_im = -0.1428861228865572;
             scale_times = 8192;
             pixel_times = 1;
             color_reversal = false;
@@ -591,11 +619,11 @@ public class SettingsActivity extends AppCompatActivity {
         find_view();
         boolean flag_return = false;
         flag_should_reload = true;
-        // if(!"java.lang.NumberFormatException: empty String".equals(e.toString()))
-        // 显然这里的try,catch不应该这么搞，但是不知道标准的用法是怎样的，暂时将就下
+        //这里是很久以前写的，写得很烂，但是能用，懒得改了
+        //fixme 在不同机型可能不适用(catch到的错误不同)
 
         try {
-            center_x = Double.parseDouble(et1.getText().toString());
+            center_re = Double.parseDouble(et1.getText().toString());
             et1.setTextColor(ContextCompat.getColor(context,R.color.text_color));
         } catch (NumberFormatException e) {
             if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
@@ -605,7 +633,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         try {
-            center_y = Double.parseDouble(et2.getText().toString());
+            center_im = Double.parseDouble(et2.getText().toString());
             et2.setTextColor(ContextCompat.getColor(context,R.color.text_color));
         } catch (NumberFormatException e) {
             if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
@@ -627,38 +655,6 @@ public class SettingsActivity extends AppCompatActivity {
             if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
                 flag_return = true;
                 et3.setTextColor(ContextCompat.getColor(this,R.color.red));
-            }
-        }
-
-        try {
-            double d = Double.parseDouble(et4.getText().toString());
-            if (d > 3 || d < 0.1) {
-                et4.setTextColor(ContextCompat.getColor(this,R.color.red));
-                flag_return = true;
-            } else {
-                pixel_times = d;
-                et4.setTextColor(ContextCompat.getColor(context,R.color.text_color));
-            }
-        } catch (NumberFormatException e) {
-            if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
-                et4.setTextColor(ContextCompat.getColor(this,R.color.red));
-                flag_return = true;
-            }
-        }
-
-        try {
-            double d = Double.parseDouble(et5.getText().toString());
-            if (d > 1 || d < 0.1) {
-                et5.setTextColor(ContextCompat.getColor(this,R.color.red));
-                flag_return = true;
-            } else {
-                generate_now_quality = d;
-                et5.setTextColor(ContextCompat.getColor(context,R.color.text_color));
-            }
-        } catch (NumberFormatException e) {
-            if (!"java.lang.NumberFormatException: empty String".equals(e.toString())) {
-                et5.setTextColor(ContextCompat.getColor(this,R.color.red));
-                flag_return = true;
             }
         }
 
@@ -706,11 +702,9 @@ public class SettingsActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     public void settings_load(View v) {
         find_view();
-        et1.setText(Double.toString(center_x));
-        et2.setText(Double.toString(center_y));
+        et1.setText(Double.toString(center_re));
+        et2.setText(Double.toString(center_im));
         et3.setText(Double.toString(scale_times));
-        et4.setText(Double.toString(pixel_times));
-        et5.setText(Double.toString(generate_now_quality));
         et6.setText(Integer.toString(iteration_times));
         et7.setText(Integer.toString(auto_iteration_max));
     }
@@ -720,8 +714,6 @@ public class SettingsActivity extends AppCompatActivity {
         et1.setText("");
         et2.setText("");
         et3.setText("");
-        et4.setText("");
-        et5.setText("");
         et6.setText("");
         et7.setText("");
     }
@@ -732,8 +724,6 @@ public class SettingsActivity extends AppCompatActivity {
         et1 = findViewById(R.id.preferences_edit1);
         et2 = findViewById(R.id.preferences_edit2);
         et3 = findViewById(R.id.preferences_edit3);
-        et4 = findViewById(R.id.preferences_edit4);
-        et5 = findViewById(R.id.preferences_edit5);
         et6 = findViewById(R.id.preferences_edit6);
         et7 = findViewById(R.id.preferences_edit7);
     }

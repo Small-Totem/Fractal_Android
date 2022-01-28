@@ -36,23 +36,28 @@ public class ZLogView {
     private final AppCompatActivity activity;
 
     public final LinearLayout linearLayout;
-    public final ScrollView scrollview;
+    public final ScrollView scrollView;
     public final ProgressBar doing_task_ProgressBar;
 
     //ProgressBar可为null
-    public ZLogView(AppCompatActivity a, LinearLayout ll, ScrollView sv, ProgressBar pb){
+    public ZLogView(AppCompatActivity a, ScrollView sv, ProgressBar pb){
         activity=a;
         span_light_blue = new ForegroundColorSpan(Color.rgb(15,129,218));
         span_red = new ForegroundColorSpan(Color.RED);
         span_light_red = new ForegroundColorSpan(Color.rgb(255,94,94));
         span_yellow = new ForegroundColorSpan(Color.YELLOW);
         span_white = new ForegroundColorSpan(Color.WHITE);
-        linearLayout =ll;
-        scrollview=sv;
+        linearLayout = new LinearLayout(a);
+        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+        scrollView = sv;
+        scrollView.addView(linearLayout);
         doing_task_ProgressBar =pb;
 
         //这里是两个lambda
-        listener= () -> scrollview.post(() -> scrollview.fullScroll(View.FOCUS_DOWN));
+        listener= () -> scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
 
         scroll_down_enabled(true);
     }
@@ -102,17 +107,17 @@ public class ZLogView {
         //由于info_add的实现用到了runOnUiThread 实际的view添加过程是在UI线程中完成的而非此处
         //所以这里也要runOnUiThread 保证下滑操作在log成功添加后执行
         //然后 不能直接scrollview.fullScroll(ScrollView.FOCUS_DOWN) 还要带个post 具体可参考https://blog.csdn.net/hanjieson/article/details/10312861
-        activity.runOnUiThread(()-> scrollview.post(() -> scrollview.fullScroll(ScrollView.FOCUS_DOWN)));
+        activity.runOnUiThread(()-> scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN)));
     }
 
     public void scroll_down_enabled(boolean enabled){
         if(OnGlobalLayoutListener_enabled&&!enabled){
             OnGlobalLayoutListener_enabled=false;
-            scrollview.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+            scrollView.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
         }
         else if(!OnGlobalLayoutListener_enabled&&enabled){
             OnGlobalLayoutListener_enabled=true;
-            scrollview.getViewTreeObserver().addOnGlobalLayoutListener(listener);
+            scrollView.getViewTreeObserver().addOnGlobalLayoutListener(listener);
         }
     }
 

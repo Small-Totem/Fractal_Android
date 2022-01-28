@@ -10,19 +10,21 @@
     >
 
     <!--分形图-->
-    <ImageView
+    <com.zjh.fractal.view.DragFractalView
         android:id="@+id/fractal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center" />
 
     <!--log和进度-->
+    <!--这里的高度220如果要改,MainActivity里的init_view()里的东西也要改奥
+    (一个妥协产生的破事)-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@color/back_for_layout"
         android:id="@+id/generate_info"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        android:visibility="gone"
+        android:translationY="-220dp"
         android:alpha="0.7"
         >
         <LinearLayout
@@ -49,13 +51,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 >
-                <LinearLayout
-                    android:id="@+id/generate_info_LinearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    >
-                </LinearLayout>
             </ScrollView>
         </LinearLayout>
 
@@ -193,7 +188,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:id="@+id/_horizontal"
+            android:id="@+id/axis_horizontal"
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:background="@color/white" />
@@ -531,7 +526,7 @@
                             android:layout_gravity="start|center_vertical"
                             />
                         <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/fractal_switch1"
+                            android:id="@+id/fractal_switch_generate_now"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true"
@@ -552,7 +547,7 @@
                             android:layout_gravity="start|center_vertical"
                             />
                         <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/fractal_switch2"
+                            android:id="@+id/fractal_switch_transparent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="false"
@@ -574,7 +569,7 @@
                             android:layout_gravity="start|center_vertical"
                             />
                         <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/fractal_switch3"
+                            android:id="@+id/fractal_switch_more"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="false"
@@ -596,7 +591,7 @@
                             android:layout_gravity="start|center_vertical"
                             />
                         <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/fractal_switch4"
+                            android:id="@+id/fractal_switch_axis"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="false"
@@ -618,7 +613,7 @@
                             android:layout_gravity="start|center_vertical"
                             />
                         <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/fractal_switch5"
+                            android:id="@+id/fractal_switch_generate_info"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="false"
@@ -662,7 +657,7 @@
             android:layout_alignParentBottom="true"
             >
             <TextView
-                android:id="@+id/fractal_text_x"
+                android:id="@+id/fractal_text_re"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxHeight="20dp"
@@ -671,18 +666,18 @@
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/fractal_text_y"/>
+                app:layout_constraintEnd_toStartOf="@id/fractal_text_im"/>
 
             <TextView
-                android:id="@+id/fractal_text_y"
+                android:id="@+id/fractal_text_im"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxHeight="20dp"
                 android:text="Y=0"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                app:layout_constraintStart_toEndOf="@+id/fractal_text_x"
-                app:layout_constraintTop_toTopOf="@+id/fractal_text_x"
+                app:layout_constraintStart_toEndOf="@+id/fractal_text_re"
+                app:layout_constraintTop_toTopOf="@+id/fractal_text_re"
                 app:layout_constraintEnd_toStartOf="@+id/hide"/>
 
 
@@ -695,7 +690,7 @@
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/fractal_text_x"
+                app:layout_constraintTop_toBottomOf="@+id/fractal_text_re"
                 app:layout_constraintEnd_toStartOf="@id/fractal_text_scale"/>
 
             <TextView

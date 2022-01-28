@@ -29,15 +29,15 @@ static int static_id = 0;
 static int static_color_reversal = 0;
 static int static_generate_mode = 0;
 static int static_iteration_times = 0;
-static int static_PIXEL_X = 0;
-static int static_PIXEL_Y = 0;
+static int static_pixel_x = 0;
+static int static_pixel_y = 0;
 static int static_use_thread = 0;
 static int static_auto_iteration_max = 0;
 static int static_flag_monitor_generate_info = 0;
 static int static_flag_should_use_symmetrical_generate = 0;
 static double static_scale = 0;
-static double static_CENTER_X = 0;
-static double static_CENTER_Y = 0;
+static double static_center_re = 0;
+static double static_center_im = 0;
 static char* static_file_path;
 static uint8_t* curr_data=NULL;
 
@@ -598,17 +598,17 @@ void symmetrical_generate(uint8_t *p)
     uint8_t *temp1 = p;
     uint8_t *temp2 = p;
 
-    temp2 += 3 * static_PIXEL_X * static_PIXEL_Y;
-    temp2 -= 3 * static_PIXEL_X;
-    for (int i1 = 0; i1 < ((static_PIXEL_Y + 1) / 2); i1++)
+    temp2 += 3 * static_pixel_x * static_pixel_y;
+    temp2 -= 3 * static_pixel_x;
+    for (int i1 = 0; i1 < ((static_pixel_y + 1) / 2); i1++)
     {
-        for (int i2 = 0; i2 < 3 * static_PIXEL_X; i2++)
+        for (int i2 = 0; i2 < 3 * static_pixel_x; i2++)
         {
             *temp2 = *temp1;
             temp1++;
             temp2++;
         }
-        temp2 -= 2 * 3 * static_PIXEL_X;
+        temp2 -= 2 * 3 * static_pixel_x;
     }
 }
 
@@ -626,32 +626,32 @@ void *multithread_generate(void *arg)
 
     if (static_flag_should_use_symmetrical_generate == 1)
     {
-        one_part_of_temp_i = (static_PIXEL_Y / 2) / static_use_thread;
+        one_part_of_temp_i = (static_pixel_y / 2) / static_use_thread;
     }
     else
     {
-        one_part_of_temp_i = (static_PIXEL_Y) / static_use_thread;
+        one_part_of_temp_i = (static_pixel_y) / static_use_thread;
     }
 
     temp_i_start = tmp.thread_id * one_part_of_temp_i;
 
-    p += temp_i_start * static_PIXEL_X * 3;
+    p += temp_i_start * static_pixel_x * 3;
     temp_i_end = temp_i_start + one_part_of_temp_i;
     if (tmp.thread_id == static_use_thread - 1)
     {
         //处理不能被整除的情况(多出来的全部由最后一个线程渲染)
         if (static_flag_should_use_symmetrical_generate == 1)
         {
-            temp_i_end += (static_PIXEL_Y / 2) % static_use_thread;
+            temp_i_end += (static_pixel_y / 2) % static_use_thread;
         }
         else
         {
-            temp_i_end += static_PIXEL_Y % static_use_thread;
+            temp_i_end += static_pixel_y % static_use_thread;
         }
     }
 
-    temp_i = static_PIXEL_Y;
-    temp_j = static_PIXEL_X;
+    temp_i = static_pixel_y;
+    temp_j = static_pixel_x;
     temp_scale = 512.0 * (static_scale);
 
     int divider = (temp_i_end - temp_i_start) / 100; //更新渲染进度的频繁度
@@ -663,8 +663,8 @@ void *multithread_generate(void *arg)
     {
         for (int j = 0; j < temp_j; ++j)
         {
-            struct param_for_auto_iteration param_continue = mandelbrot((static_CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                                                        (static_CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
+            struct param_for_auto_iteration param_continue = mandelbrot((static_center_re) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                                                        (static_center_im) - temp_i / (2 * temp_scale) + i / temp_scale,
                                                                         static_id, static_color_reversal, static_iteration_times);
 
             uint8_t n = param_continue.n * 255;
@@ -679,8 +679,8 @@ void *multithread_generate(void *arg)
                     //对黑色的地方提高迭代次数
                     if (n == 0)
                     {
-                        param_continue = mandelbrot_continue((static_CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                                             (static_CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
+                        param_continue = mandelbrot_continue((static_center_re) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                                             (static_center_im) - temp_i / (2 * temp_scale) + i / temp_scale,
                                                              param_continue.a, param_continue.b, static_id, static_color_reversal,
                                                              it_start, it_end);
                         n = param_continue.n * 255;
@@ -695,8 +695,8 @@ void *multithread_generate(void *arg)
                 if (n == 0)
                 {
                     //对还是黑色的地方进行最后一次迭代
-                    n = mandelbrot_continue((static_CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                            (static_CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
+                    n = mandelbrot_continue((static_center_re) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                            (static_center_im) - temp_i / (2 * temp_scale) + i / temp_scale,
                                             param_continue.a, param_continue.b, static_id, static_color_reversal,
                                             it_start, static_auto_iteration_max)
                             .n *
@@ -724,6 +724,7 @@ void *post_generate_progress(void *arg)
     //这里最关键的env和thiz不能直接用struct传进来，必须按照以下网址的方法
     //参见https://www.cnblogs.com/aiguozhe/p/5355226.html
     //update:从SetStaticDoubleField换成SetDoubleArrayRegion了，不用thiz了
+    //  update:这里其实用线程隔一会发送一次好像不太好，应该在渲染线程中计算并主动发送，懒得改了
     JNIEnv *env;
     (*gs_jvm)->AttachCurrentThread(gs_jvm, &env, NULL);
 
@@ -747,12 +748,12 @@ void *post_generate_progress(void *arg)
 
 uint8_t * generate(int return_byte_array)
 {
-    uint8_t *data = (uint8_t *)malloc((static_PIXEL_Y) * (static_PIXEL_X)*3);
+    uint8_t *data = (uint8_t *)malloc((static_pixel_y) * (static_pixel_x) * 3);
 
     curr_data=data;
 
     //多线程
-    if (static_use_thread > 1 && static_PIXEL_Y >= 20)
+    if (static_use_thread > 1 && static_pixel_y >= 20)
     {
         pthread_t my_thread[10];
         struct param_for_thread param1[10];
@@ -778,7 +779,7 @@ uint8_t * generate(int return_byte_array)
         generate_info_output(INFO_STATUS_NORMAL,"渲染完成,正在写入");
 
         FILE *file = fopen(static_file_path, "wb");
-        svpng(file, (static_PIXEL_X), (static_PIXEL_Y), data, 0);
+        svpng(file, (static_pixel_x), (static_pixel_y), data, 0);
         fclose(file);
         free(data);
         generate_info_output(INFO_TEXT_GREEN,"完成");
@@ -789,16 +790,16 @@ uint8_t * generate(int return_byte_array)
     else
     {
         uint8_t *p = data;
-        double temp_i = (static_PIXEL_Y);
-        double temp_j = (static_PIXEL_X);
+        double temp_i = (static_pixel_y);
+        double temp_j = (static_pixel_x);
         double temp_scale = 512.0 * (static_scale);
 
         for (int i = 0; i < temp_i; ++i)
         {
             for (int j = 0; j < temp_j; ++j)
             {
-                struct param_for_auto_iteration param_continue = mandelbrot((static_CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                                                            (static_CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
+                struct param_for_auto_iteration param_continue = mandelbrot((static_center_re) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                                                            (static_center_im) - temp_i / (2 * temp_scale) + i / temp_scale,
                                                                             static_id, static_color_reversal, static_iteration_times);
 
                 uint8_t n = param_continue.n * 255;
@@ -813,8 +814,8 @@ uint8_t * generate(int return_byte_array)
                         //对黑色的地方提高迭代次数
                         if (n == 0)
                         {
-                            param_continue = mandelbrot_continue((static_CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                                                 (static_CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
+                            param_continue = mandelbrot_continue((static_center_re) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                                                 (static_center_im) - temp_i / (2 * temp_scale) + i / temp_scale,
                                                                  param_continue.a, param_continue.b, static_id, static_color_reversal,
                                                                  it_start, it_end);
                             n = param_continue.n * 255;
@@ -829,8 +830,8 @@ uint8_t * generate(int return_byte_array)
                     if (n == 0)
                     {
                         //对还是黑色的地方进行最后一次迭代
-                        n = mandelbrot_continue((static_CENTER_X)-temp_j / (2 * (temp_scale)) + j / (temp_scale),
-                                                (static_CENTER_Y)-temp_i / (2 * temp_scale) + i / temp_scale,
+                        n = mandelbrot_continue((static_center_re) - temp_j / (2 * (temp_scale)) + j / (temp_scale),
+                                                (static_center_im) - temp_i / (2 * temp_scale) + i / temp_scale,
                                                 param_continue.a, param_continue.b, static_id, static_color_reversal,
                                                 it_start, static_auto_iteration_max)
                                 .n *
@@ -870,7 +871,7 @@ uint8_t * generate(int return_byte_array)
         generate_info_output(INFO_STATUS_NORMAL,"渲染完成,正在写入");
 
         FILE *file = fopen(static_file_path, "wb");
-        svpng(file, (static_PIXEL_X), (static_PIXEL_Y), data, 0);
+        svpng(file, (static_pixel_x), (static_pixel_y), data, 0);
         fclose(file);
         free(data);
         generate_info_output(INFO_TEXT_GREEN,"完成");
@@ -880,25 +881,25 @@ uint8_t * generate(int return_byte_array)
 
 JNIEXPORT jbyteArray JNICALL
 Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
-                             jint screen_height, jint screen_width,
-                             jdouble center_x, jdouble center_y,
-                             jdouble scale_times, jint fractal_id,
-                             jint color_reversal, jint generate_mode,
-                             jint iteration_times, jint use_thread,
-                             jint auto_iteration_max, jint monitor_generate_info,
-                             jint return_byte_array)
+                                                  jint screen_height, jint screen_width,
+                                                  jdouble center_re, jdouble center_im,
+                                                  jdouble scale_times, jint fractal_id,
+                                                  jint color_reversal, jint generate_mode,
+                                                  jint iteration_times, jint use_thread,
+                                                  jint auto_iteration_max, jint monitor_generate_info,
+                                                  jint return_byte_array)
 {
     static_id = fractal_id;
     static_color_reversal = color_reversal;
     static_generate_mode = generate_mode;
     static_iteration_times = iteration_times;
-    static_PIXEL_X = screen_width;
-    static_PIXEL_Y = screen_height;
+    static_pixel_x = screen_width;
+    static_pixel_y = screen_height;
     static_use_thread = use_thread;
     static_auto_iteration_max = auto_iteration_max;
     static_scale = scale_times;
-    static_CENTER_X = center_x;
-    static_CENTER_Y = center_y;
+    static_center_re = center_re;
+    static_center_im = center_im;
     static_flag_monitor_generate_info = monitor_generate_info;
     static_flag_if_finished=0;
 
@@ -907,7 +908,7 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
     for(int i=0;i<10;i++){
         static_generate_progress_thread[i]=0;
     }
-    if (static_CENTER_Y == 0 && ((static_id <= 4 && static_id >= -1) || static_id == 15))
+    if (static_center_im == 0 && ((static_id <= 4 && static_id >= -1) || static_id == 15))
     {
         static_flag_should_use_symmetrical_generate = 1;
         generate_info_output(INFO_STATUS_NORMAL,"启用对称渲染加速");
@@ -919,7 +920,6 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
 
     //输出 启用x线程渲染
     generate_info_output(INFO_STATUS_NORMAL,get_string_from_text_num_text("启用", static_use_thread, "线程渲染"));
-
     pthread_t progress_thread;
 
     if (monitor_generate_info)
@@ -933,8 +933,8 @@ Java_com_zjh_fractal_MainActivity_GenerateFractal(JNIEnv *env, jobject thiz,
     generate_info_output(INFO_TEXT_GREY,"JNI调用结束");
 
     if(return_byte_array){
-        jbyteArray jbytes = (*env)->NewByteArray(env,(static_PIXEL_Y) * (static_PIXEL_X) * 3);
-        (*env)->SetByteArrayRegion(env, jbytes, 0, (static_PIXEL_Y) * (static_PIXEL_X) * 3, (jbyte*)p);
+        jbyteArray jbytes = (*env)->NewByteArray(env, (static_pixel_y) * (static_pixel_x) * 3);
+        (*env)->SetByteArrayRegion(env, jbytes, 0, (static_pixel_y) * (static_pixel_x) * 3, (jbyte*)p);
         return jbytes;
     }
     else
@@ -960,4 +960,5 @@ JNIEXPORT void JNICALL
 Java_com_zjh_fractal_MainActivity_notify_1free_1data(JNIEnv *env, jobject thiz) {
     if(curr_data!=NULL)
         free(curr_data);
+    curr_data=NULL;
 }

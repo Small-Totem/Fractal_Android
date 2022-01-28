@@ -12,6 +12,18 @@
 
     <PreferenceCategory app:title="参数/其他"
         app:iconSpaceReserved="false">
+        <SeekBarPreference
+            app:key="generate_quality_Preference"
+            app:title="渲染倍率"
+            app:iconSpaceReserved="false"
+            app:updatesContinuously="true"
+            />
+        <SeekBarPreference
+            app:key="generate_now_quality_Preference"
+            app:title="立即渲染倍率"
+            app:iconSpaceReserved="false"
+            app:updatesContinuously="true"
+            />
         <SwitchPreference
             app:key="color_reverse_Preference"
             app:title="渲染颜色反转"
